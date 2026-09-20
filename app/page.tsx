@@ -21,7 +21,7 @@ const ranges = {
 
 const indices = [
   { name: "H100", code: "SDH100RT", value: "$2.63", unit: "/GPU·h", change: -0.4, path: "M0 28 L16 10 L36 10 L53 10 L70 20 L86 20 L100 38" },
-  { name: "H100 Hyperscaler", code: "H100-HYP", value: "$7.20", unit: "/GPU·h", change: 0.1, path: "M0 24 L16 38 L34 28 L51 28 L68 10 L100 10" },
+  { name: "H100 Hyperscaler（超大规模云）", code: "H100-HYP", value: "$7.20", unit: "/GPU·h", change: 0.1, path: "M0 24 L16 38 L34 28 L51 28 L68 10 L100 10" },
   { name: "A100", code: "SDA100RT", value: "$1.58", unit: "/GPU·h", change: -0.6, path: "M0 8 L18 32 L42 32 L68 32 L100 32" },
   { name: "B200", code: "SDB200RT", value: "$5.73", unit: "/GPU·h", change: 0.5, path: "M0 36 L15 20 L32 10 L50 10 L68 28 L100 12" },
 ];
