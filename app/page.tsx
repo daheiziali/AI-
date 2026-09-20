@@ -8,6 +8,7 @@ import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { gpuIndices, ramIndices, tokenIndices, type IndexDefinition } from "@/app/data/indices";
+import { getRankedModels, modelRankingWindows, type ModelRankingWindow } from "@/app/data/llm-models";
 import { tokenHistory } from "@/app/data/token-history";
 
 const historyRanges = { "7D": 7, "30D": 30, "90D": 90, "全部": Infinity } as const;
@@ -49,6 +50,36 @@ function CompanyPanel() {
     <article className="epoch-panel company-panel" id="ai-companies">
       <div className="epoch-panel-head"><div><p className="eyebrow">AI COMPANY RANKING</p><h4>AI公司排行</h4></div><span>5 个维度</span></div>
       <div className="company-rank-grid">{companyRankingGroups.map((group) => <div className="company-rank-card" key={group.title}><div><strong>{group.title}</strong><small>{group.unit}</small></div>{group.items.map((item, index) => <p key={item.name}><b>{index + 1}</b><span>{item.name}</span><em>{item.value}</em></p>)}</div>)}</div>
+    </article>
+  );
+}
+
+function LlmModelPanel({ window, setWindow }: { window: ModelRankingWindow; setWindow: (value: ModelRankingWindow) => void }) {
+  const models = getRankedModels(window);
+  return (
+    <article className="epoch-panel model-panel" id="llm-models">
+      <div className="epoch-panel-head">
+        <div><p className="eyebrow">LLM MODEL RANKING</p><h4>LLM模型排行榜</h4></div>
+        <span>OpenRouter</span>
+      </div>
+      <div className="model-ranking-top">
+        <Tabs value={window} onValueChange={(value) => setWindow(value as ModelRankingWindow)}>
+          <TabsList>{Object.entries(modelRankingWindows).map(([key, label]) => <TabsTrigger key={key} value={key}>{label}</TabsTrigger>)}</TabsList>
+        </Tabs>
+        <p>按 Token 消耗量排序，默认展示最近完整日数据。</p>
+      </div>
+      <div className="ranking-table model-ranking-table">
+        <div className="ranking-header model-ranking-header"><span>模型</span><span>Token 消耗</span><span>变化</span><span>详情</span></div>
+        {models.map((model, index) => (
+          <div className="ranking-row model-ranking-row" key={model.slug}>
+            <b>{index + 1}</b>
+            <div><strong>{model.name}</strong><small>{model.providerLabel}</small></div>
+            <span>{model.ranking[window].display}</span>
+            <span className={model.ranking[window].change >= 0 ? "positive" : "negative"}>{model.ranking[window].change >= 0 ? "+" : ""}{model.ranking[window].change}%</span>
+            <a href={`/models/${model.slug}`}>详情 <ArrowRight /></a>
+          </div>
+        ))}
+      </div>
     </article>
   );
 }
@@ -111,6 +142,7 @@ function TokenHistoryChart() {
 export default function Home() {
   const [navOpen, setNavOpen] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(["AI算力CPI", "H100"]);
+  const [modelWindow, setModelWindow] = useState<ModelRankingWindow>("day");
 
   const toggleFavorite = (name: string) => {
     setFavorites((current) => current.includes(name) ? current.filter((item) => item !== name) : [...current, name]);
@@ -135,6 +167,7 @@ export default function Home() {
           <p className="nav-label nav-label-spaced">AI动态排行</p>
           <a className="nav-item" href="#data-centers"><Server />AI数据中心</a>
           <a className="nav-item" href="#ai-companies"><Building2 />AI公司排行</a>
+          <a className="nav-item" href="#llm-models"><BarChart3 />LLM模型排行</a>
           <p className="nav-label nav-label-spaced">TOOLS</p>
           <a className="nav-item" href="#watch"><Star />自选</a>
           <a className="nav-item" href="#alerts"><Bell />价格预警<span className="nav-count">3</span></a>
@@ -186,12 +219,13 @@ export default function Home() {
               <div className="landscape-tabs" aria-label="数据视图"><span className="active">排行</span><span>趋势</span><span>明细</span></div>
             </div>
             <div className="landscape-hero">
-              <div><h3>聚焦更动态的基础设施与公司经营数据，跟踪 AI 算力供给、资本投入与商业化变化。</h3><small className="source-note">数据参考：Epoch AI 历史数据</small></div>
-              <div className="landscape-stats"><span><strong>2</strong>数据模块</span><span><strong>3</strong>数据中心维度</span><span><strong>5</strong>公司排行维度</span></div>
+              <div><h3>聚焦更动态的基础设施、公司经营与模型调用数据，跟踪 AI 算力供给、资本投入与推理流量变化。</h3><small className="source-note">数据参考：Epoch AI 历史数据、OpenRouter 模型排行</small></div>
+              <div className="landscape-stats"><span><strong>3</strong>数据模块</span><span><strong>3</strong>数据中心维度</span><span><strong>3</strong>模型时间窗口</span></div>
             </div>
             <div className="epoch-grid">
               <DataCenterPanel />
               <CompanyPanel />
+              <LlmModelPanel window={modelWindow} setWindow={setModelWindow} />
             </div>
           </section>
         </main>
