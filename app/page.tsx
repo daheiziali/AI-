@@ -76,7 +76,7 @@ function MarketChart({ range }: { range: keyof typeof ranges }) {
 export default function Home() {
   const [range, setRange] = useState<keyof typeof ranges>("30D");
   const [navOpen, setNavOpen] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>(["AI Compute CPI", "H100"]);
+  const [favorites, setFavorites] = useState<string[]>(["AI算力CPI", "H100"]);
   const [alertSaved, setAlertSaved] = useState(false);
 
   const toggleFavorite = (name: string) => {
@@ -115,7 +115,7 @@ export default function Home() {
 
         <main id="overview" className="content">
           <section className="market-head">
-            <div><div className="market-title"><span className="index-chip">综合指数</span><span>截至 2026.09.18 · 工作日更新</span></div><h2>AI Compute CPI <button className={favorites.includes("AI Compute CPI") ? "is-favorite" : ""} onClick={() => toggleFavorite("AI Compute CPI")} aria-label="收藏 AI Compute CPI" aria-pressed={favorites.includes("AI Compute CPI")}><Star /></button></h2><p>综合衡量 GPU 租赁、LLM Token 与内存成本的 AI 算力价格水平。</p></div>
+            <div><div className="market-title"><span className="index-chip">综合指数</span><span>截至 2026.09.18 · 工作日更新</span></div><h2>AI算力CPI <button className={favorites.includes("AI算力CPI") ? "is-favorite" : ""} onClick={() => toggleFavorite("AI算力CPI")} aria-label="收藏 AI算力CPI" aria-pressed={favorites.includes("AI算力CPI")}><Star /></button></h2><p>综合衡量 GPU 租赁、LLM Token 与内存成本的 AI 算力价格水平。</p></div>
             <Dialog onOpenChange={(open) => open && setAlertSaved(false)}>
               <DialogTrigger asChild><Button className="alert-button"><Bell />设置预警</Button></DialogTrigger>
               <DialogContent className="alert-dialog">
