@@ -68,7 +68,7 @@ function CapabilityPanel() {
 function ComputeScatter() {
   return (
     <article className="epoch-panel compute-panel" id="model-compute">
-      <div className="epoch-panel-head"><div><p className="eyebrow">TRAINING COMPUTE</p><h4>知名 AI 模型训练算力</h4></div><span>1950-2026</span></div>
+      <div className="epoch-panel-head"><div><p className="eyebrow">TRAINING COMPUTE</p><h4>知名 AI 模型训练算力</h4></div><span>代表模型</span></div>
       <div className="compute-chart" role="img" aria-label="知名 AI 模型训练算力趋势散点图">
         <svg viewBox="0 0 680 310" preserveAspectRatio="none">
           {[54, 118, 182, 246].map((y) => <line key={y} x1="28" x2="660" y1={y} y2={y} className="grid-line" />)}
@@ -260,7 +260,7 @@ export default function Home() {
               <div className="landscape-tabs" aria-label="数据视图"><span className="active">图表</span><span>表格</span><span>地图</span></div>
             </div>
             <div className="landscape-hero">
-              <div><span className="index-chip">Epoch AI 数据源</span><h3>从模型能力、训练算力到数据中心和公司经营，追踪 AI 产业扩张的关键变量。</h3></div>
+              <div><h3>从模型能力、训练算力到数据中心和公司经营，追踪 AI 产业扩张的关键变量。</h3><small className="source-note">数据参考：Epoch AI</small></div>
               <div className="landscape-stats"><span><strong>5</strong>数据模块</span><span><strong>3.6k+</strong>模型库</span><span><strong>86</strong>数据中心</span></div>
             </div>
             <div className="epoch-grid">
