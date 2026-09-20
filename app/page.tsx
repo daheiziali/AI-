@@ -104,7 +104,7 @@ export default function Home() {
 
         <main id="overview" className="content">
           <section className="market-head">
-            <div><div className="market-title"><span className="index-chip">AI 推理价格基准</span><span>截至 2026.09.18 · 工作日更新</span></div><h2>AI算力CPI <button className={favorites.includes("AI算力CPI") ? "is-favorite" : ""} onClick={() => toggleFavorite("AI算力CPI")} aria-label="收藏 AI算力CPI" aria-pressed={favorites.includes("AI算力CPI")}><Star /></button></h2><p>追踪 AI 推理价格变化，快速了解每百万 Token 的市场支出走势。</p></div>
+            <div><div className="market-title"><span className="index-chip">AI 推理价格基准</span><span>截至 2026.09.18 · 工作日更新</span></div><h2>AI算力CPI <button className={favorites.includes("AI算力CPI") ? "is-favorite" : ""} onClick={() => toggleFavorite("AI算力CPI")} aria-label="收藏 AI算力CPI" aria-pressed={favorites.includes("AI算力CPI")}><Star /></button></h2><p>以 LLM Token 支出衡量真实推理成本，覆盖模型调用的核心算力消耗，是观察 AI 推理价格变化的市场基准。</p></div>
             <Dialog onOpenChange={(open) => open && setAlertSaved(false)}>
               <DialogTrigger asChild><Button className="alert-button"><Bell />设置预警</Button></DialogTrigger>
               <DialogContent className="alert-dialog">
@@ -116,13 +116,13 @@ export default function Home() {
           </section>
 
           <section className="hero-grid">
-            <div className="hero-metric"><p>当前价格</p><strong>$1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>USD / 百万 Tokens</small></div>
+            <div className="hero-metric"><div className="hero-index"><span>LLM Token支出指数</span><small>SDLLMTK</small></div><p>当前价格</p><strong>$1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>USD / 百万 Tokens</small><a href="/indices/llm-token-expenditure">查看指数详情 <ArrowRight /></a></div>
             <div className="hero-chart"><TokenHistoryChart /></div>
           </section>
 
           <section id="token" className="section-block data-band token-band">
-            <div className="section-head"><div><p className="eyebrow">LLM TOKEN EXPENDITURE INDEX</p><h3>AI 推理价格指数</h3></div></div>
-            <div className="index-grid token-grid">{tokenIndices.map(renderIndexCard)}</div>
+            <div className="section-head"><div><p className="eyebrow">LLM TOKEN EXPENDITURE INDEX</p><h3>开源与闭源市场</h3></div></div>
+            <div className="index-grid token-grid">{tokenIndices.filter((item) => item.slug !== "llm-token-expenditure").map(renderIndexCard)}</div>
           </section>
 
           <section id="gpu" className="section-block">
