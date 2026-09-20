@@ -6,9 +6,6 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { gpuIndices, ramIndices, tokenIndices, type IndexDefinition } from "@/app/data/indices";
 import { tokenHistory } from "@/app/data/token-history";
@@ -22,7 +19,7 @@ function TokenHistoryChart() {
     const days = historyRanges[range];
     if (!Number.isFinite(days)) return tokenHistory;
     const latest = new Date(`${tokenHistory.at(-1)?.date}T00:00:00Z`).getTime();
-    const cutoff = latest - days * 86400000;
+    const cutoff = latest - (days - 1) * 86400000;
     return tokenHistory.filter((point) => new Date(`${point.date}T00:00:00Z`).getTime() >= cutoff);
   }, [range]);
   const values = visible.map((point) => point.value);
@@ -66,7 +63,6 @@ function TokenHistoryChart() {
 export default function Home() {
   const [navOpen, setNavOpen] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(["AI算力CPI", "H100"]);
-  const [alertSaved, setAlertSaved] = useState(false);
 
   const toggleFavorite = (name: string) => {
     setFavorites((current) => current.includes(name) ? current.filter((item) => item !== name) : [...current, name]);
@@ -105,14 +101,6 @@ export default function Home() {
         <main id="overview" className="content">
           <section className="market-head">
             <div><div className="market-title"><span className="index-chip">AI 推理价格基准</span><span>截至 2026.09.18 · 工作日更新</span></div><h2>AI算力CPI <button className={favorites.includes("AI算力CPI") ? "is-favorite" : ""} onClick={() => toggleFavorite("AI算力CPI")} aria-label="收藏 AI算力CPI" aria-pressed={favorites.includes("AI算力CPI")}><Star /></button></h2><p>以 LLM Token 支出衡量真实推理成本，覆盖模型调用的核心算力消耗，是观察 AI 推理价格变化的市场基准。</p></div>
-            <Dialog onOpenChange={(open) => open && setAlertSaved(false)}>
-              <DialogTrigger asChild><Button className="alert-button"><Bell />设置预警</Button></DialogTrigger>
-              <DialogContent className="alert-dialog">
-                <DialogHeader><DialogTitle>设置 AI算力CPI 预警</DialogTitle><DialogDescription>每百万 Token 支出达到条件后，通过 App 推送和邮件提醒。</DialogDescription></DialogHeader>
-                {alertSaved ? <div className="alert-success"><Bell /><strong>预警已开启</strong><span>当价格高于 $1.10 / M tokens 时提醒你</span></div> : <div className="alert-form"><label>触发条件<div className="condition-row"><span>高于</span><Input defaultValue="1.10" inputMode="decimal" /></div></label><label className="switch-row"><span><strong>App 推送</strong><small>实时接收价格变化</small></span><Switch defaultChecked /></label><label className="switch-row"><span><strong>邮件摘要</strong><small>工作日收盘后发送</small></span><Switch defaultChecked /></label></div>}
-                <DialogFooter>{!alertSaved && <Button onClick={() => setAlertSaved(true)}>保存预警</Button>}</DialogFooter>
-              </DialogContent>
-            </Dialog>
           </section>
 
           <section className="hero-grid">
