@@ -5,11 +5,16 @@ import {
   Download, FileText, Home as HomeIcon, LayoutDashboard, Menu, Search, Settings, SlidersHorizontal, Sparkles, Star,
   TrendingDown, TrendingUp, WalletCards,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { tokenHistory } from "@/app/data/token-history";
+
+const historyRanges = { "7D": 7, "30D": 30, "90D": 90, "全部": Infinity } as const;
+type HistoryRange = keyof typeof historyRanges;
 
 const indices = [
   { name: "H100", code: "SDH100RT", value: "$2.63", unit: "/GPU·h", change: -0.4 },
@@ -28,13 +33,49 @@ const ramIndices = [
   { name: "GDDR6", code: "SDGDDR6", value: "$19.06", unit: "/GB", change: 1.0 },
 ];
 
-function DataPendingChart() {
+function TokenHistoryChart() {
+  const [range, setRange] = useState<HistoryRange>("30D");
+  const visible = useMemo(() => {
+    const days = historyRanges[range];
+    if (!Number.isFinite(days)) return tokenHistory;
+    const latest = new Date(`${tokenHistory.at(-1)?.date}T00:00:00Z`).getTime();
+    const cutoff = latest - days * 86400000;
+    return tokenHistory.filter((point) => new Date(`${point.date}T00:00:00Z`).getTime() >= cutoff);
+  }, [range]);
+  const values = visible.map((point) => point.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const padding = Math.max((max - min) * 0.14, 0.015);
+  const chartMin = min - padding;
+  const chartMax = max + padding;
+  const points = visible.map((point, index) => ({
+    ...point,
+    x: visible.length === 1 ? 380 : (index / (visible.length - 1)) * 760,
+    y: 205 - ((point.value - chartMin) / (chartMax - chartMin)) * 175,
+  }));
+  const line = points.map((point) => `${point.x},${point.y}`).join(" ");
+  const labels = [0, 0.25, 0.5, 0.75, 1].map((ratio) => visible[Math.min(visible.length - 1, Math.round((visible.length - 1) * ratio))]);
+  const formatDate = (date: string) => date.slice(5).replace("-", "/");
+
   return (
-    <div className="data-pending" role="status">
-      <span className="pending-icon"><FileText /></span>
-      <strong>历史走势待数据接口接入</strong>
-      <p>当前仅展示 Silicon Data 官方最新读数，不生成未经验证的历史点位。</p>
-      <div><span>用量加权</span><span>输入 / 输出归一化</span><span>每日独立验证</span></div>
+    <div className="history-chart">
+      <div className="chart-toolbar">
+        <div className="legend"><span><i className="dot cpi" />SDLLMTK · USD / 百万 Tokens</span></div>
+        <Tabs value={range} onValueChange={(value) => setRange(value as HistoryRange)}><TabsList>{Object.keys(historyRanges).map((item) => <TabsTrigger key={item} value={item}>{item}</TabsTrigger>)}</TabsList></Tabs>
+      </div>
+      <div className="history-plot">
+        <div className="history-y" aria-hidden="true"><span>{chartMax.toFixed(2)}</span><span>{((chartMax + chartMin) / 2).toFixed(2)}</span><span>{chartMin.toFixed(2)}</span></div>
+        <svg viewBox="0 0 760 225" role="img" aria-label={`AI算力CPI ${range} 历史价格走势，最新值 ${points.at(-1)?.value.toFixed(4)}`}>
+          <defs><linearGradient id="token-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#52d6b0" stopOpacity="0.22" /><stop offset="1" stopColor="#52d6b0" stopOpacity="0" /></linearGradient></defs>
+          {[30, 117.5, 205].map((y) => <line key={y} x1="0" y1={y} x2="760" y2={y} className="grid-line" />)}
+          <polygon points={`0,215 ${line} 760,215`} fill="url(#token-area)" />
+          <polyline points={line} fill="none" stroke="#52d6b0" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
+          <line x1="760" y1="20" x2="760" y2="215" stroke="#52d6b0" strokeDasharray="4 5" opacity=".45" />
+          <circle cx={points.at(-1)?.x} cy={points.at(-1)?.y} r="4.5" fill="#08120f" stroke="#52d6b0" strokeWidth="2.5" />
+        </svg>
+        <div className="history-x" aria-hidden="true">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{formatDate(point.date)}</span>)}</div>
+      </div>
+      <div className="chart-summary"><span>{visible.length} 个观测值</span><span>区间最低 <b>${min.toFixed(3)}</b></span><span>区间最高 <b>${max.toFixed(3)}</b></span></div>
     </div>
   );
 }
@@ -93,7 +134,7 @@ export default function Home() {
 
           <section className="hero-grid">
             <div className="hero-metric"><p>当前价格</p><strong>$1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>USD / 百万 Tokens</small></div>
-            <div className="hero-chart"><div className="chart-toolbar"><div className="legend"><span><i className="dot cpi" />SDLLMTK · 广义市场</span></div><span className="verified-label">Silicon Data 官方读数</span></div><DataPendingChart /></div>
+            <div className="hero-chart"><div className="chart-source-row"><span>历史数据 · 2025.12.01 起</span><span className="verified-label">当前读数已校准</span></div><TokenHistoryChart /></div>
             <aside className="drivers"><div className="drivers-head"><span>指数变动因素</span></div><div className="driver"><span className="driver-icon gpu"><WalletCards /></span><div><strong>定价变化</strong><small>模型供应商调整 Token 价格</small></div></div><div className="driver"><span className="driver-icon token"><Sparkles /></span><div><strong>使用结构</strong><small>需求转向更贵或更便宜的模型</small></div></div><div className="driver"><span className="driver-icon ram"><Activity /></span><div><strong>篮子构成</strong><small>活跃模型与输入输出比例变化</small></div></div></aside>
           </section>
 
@@ -117,7 +158,7 @@ export default function Home() {
           <section id="methodology" className="methodology">
             <div><FileText /><span><strong>AI算力CPI 方法论</strong><small>SDLLMTK 按真实消费量加权，统一处理输入 / 输出 Token 与上下文窗口，并筛选具有持续使用和市场支出的模型。</small></span></div><div className="method-actions"><span><CalendarDays />工作日更新</span><Button variant="outline"><Download />导出日报</Button></div>
           </section>
-          <p className="data-note">最新读数来自 Silicon Data 公开页面（截至 2026.09.18）；历史序列需在获得授权数据接口后展示。</p>
+          <p className="data-note">历史序列来自已录入的 Token 支出价格指数工作簿；最新读数依据 Silicon Data 公开页面校准（截至 2026.09.18）。</p>
         </main>
       </div>
       <nav className="mobile-nav" aria-label="移动端导航"><a className="active" href="#overview"><HomeIcon /><span>总览</span></a><a href="#gpu"><Cpu /><span>指数</span></a><a href="#watch"><Star /><span>自选</span></a><a href="#alerts"><Bell /><span>预警</span></a><a href="#settings"><SlidersHorizontal /><span>我的</span></a></nav>
