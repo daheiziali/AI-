@@ -151,7 +151,7 @@ export default function Home() {
           </section>
 
           <section id="ram" className="section-block">
-            <div className="section-head"><div><p className="eyebrow">MEMORY MARKET</p><h3>RAM / 高带宽内存</h3></div><a href="#all-ram">查看全部 <span>→</span></a></div>
+            <div className="section-head"><div><p className="eyebrow">MEMORY MARKET</p><h3>RAM内存指数</h3></div><a href="#all-ram">查看全部 <span>→</span></a></div>
             <div className="ram-layout"><div className="index-grid ram-grid">{ramIndices.map(renderIndexCard)}</div><div className="related-note"><Database /><div><strong>独立关联指标</strong><p>RAM 指数用于观察内存市场价格，不参与 AI算力CPI 的计算。</p></div></div></div>
           </section>
 
