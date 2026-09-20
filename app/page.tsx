@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  Activity, ArrowRight, BarChart3, Bell, Brain, Building2, ChevronDown, Command, Cpu, Database,
-  Home as HomeIcon, Menu, Network, Search, Server, Settings, Sparkles, Star, TrendingDown, TrendingUp, Trophy,
+  Activity, ArrowRight, BarChart3, Bell, Building2, ChevronDown, Command, Cpu, Database,
+  Home as HomeIcon, Menu, Search, Server, Settings, Sparkles, Star, TrendingDown, TrendingUp,
 } from "lucide-react";
 import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,104 +13,33 @@ import { tokenHistory } from "@/app/data/token-history";
 const historyRanges = { "7D": 7, "30D": 30, "90D": 90, "全部": Infinity } as const;
 type HistoryRange = keyof typeof historyRanges;
 
-const capabilityLeaders = [
-  { name: "GPT-6 Astra", score: 166, owner: "OpenAI", type: "综合能力" },
-  { name: "Claude 4.5 Opus", score: 154, owner: "Anthropic", type: "推理" },
-  { name: "Gemini 3 Pro", score: 149, owner: "Google", type: "多模态" },
-  { name: "Grok 5", score: 141, owner: "xAI", type: "通用模型" },
-  { name: "DeepSeek R2", score: 132, owner: "DeepSeek", type: "开源权重" },
+const dataCenterRankings = [
+  { name: "Colossus 2", owner: "SpaceXAI", country: "United States", compute: "1.11M", power: "946MW", cost: "$35.8B" },
+  { name: "Microsoft Fairwater Atlanta", owner: "Microsoft", country: "United States", compute: "769k", power: "636MW", cost: "$24.1B" },
+  { name: "Anthropic-Amazon New Carlisle", owner: "Amazon", country: "United States", compute: "686k", power: "910MW", cost: "$34.5B" },
+  { name: "Meta Prometheus", owner: "Meta", country: "United States", compute: "680k", power: "562MW", cost: "$21.3B" },
+  { name: "Google Pryor North", owner: "Google", country: "United States", compute: "637k", power: "368MW", cost: "$13.9B" },
+  { name: "OpenAI Stargate Abilene", owner: "Oracle", country: "United States", compute: "509k", power: "421MW", cost: "$15.9B" },
 ];
 
-const computePoints = [
-  { name: "AlexNet", year: 2012, compute: 8, lab: "University of Toronto" },
-  { name: "Transformer", year: 2017, compute: 26, lab: "Google" },
-  { name: "GPT-3", year: 2020, compute: 58, lab: "OpenAI" },
-  { name: "PaLM", year: 2022, compute: 70, lab: "Google" },
-  { name: "GPT-4", year: 2023, compute: 82, lab: "OpenAI" },
-  { name: "Llama 3.1 405B", year: 2024, compute: 76, lab: "Meta" },
-  { name: "Gemini Ultra", year: 2024, compute: 88, lab: "Google" },
-  { name: "Frontier 2026", year: 2026, compute: 96, lab: "Frontier labs" },
+const companyRankingGroups = [
+  { title: "营收排行", unit: "Annualized revenue", items: [{ name: "Anthropic", value: "$65.0B" }, { name: "OpenAI", value: "$40.0B" }, { name: "Z.ai", value: "$1.6B" }] },
+  { title: "融资排行", unit: "Total equity funding", items: [{ name: "OpenAI", value: "$182.8B" }, { name: "Anthropic", value: "$139.4B" }, { name: "xAI", value: "$37.0B" }] },
+  { title: "人员排行", unit: "Staff reports", items: [{ name: "Google", value: "6.0k" }, { name: "OpenAI", value: "4.5k" }, { name: "Meta", value: "3.4k" }] },
+  { title: "用户排行", unit: "Active users", items: [{ name: "Meta", value: "1.0B MAU" }, { name: "OpenAI", value: "920M WAU" }, { name: "Google", value: "650M MAU" }] },
+  { title: "算力成本", unit: "Compute spend", items: [{ name: "Anthropic", value: "$13.6B" }, { name: "OpenAI", value: "$8.3B" }] },
 ];
-
-const dataCenterLeaders = [
-  { name: "Colossus 2", owner: "SpaceXAI", location: "Memphis, USA", value: 1112 },
-  { name: "Fairwater Atlanta", owner: "Microsoft", location: "Georgia, USA", value: 769 },
-  { name: "New Carlisle", owner: "Amazon", location: "Indiana, USA", value: 686 },
-  { name: "Prometheus", owner: "Meta", location: "Ohio, USA", value: 680 },
-  { name: "Pryor North", owner: "Google", location: "Oklahoma, USA", value: 637 },
-];
-
-const chipOwners = [
-  { name: "Microsoft", value: 28, color: "#52d6b0" },
-  { name: "Meta", value: 22, color: "#70a7ff" },
-  { name: "Google", value: 18, color: "#f3c969" },
-  { name: "Amazon", value: 16, color: "#c8a7ff" },
-  { name: "xAI", value: 10, color: "#ff716b" },
-  { name: "其他", value: 6, color: "#6f807a" },
-];
-
-const companySignals = [
-  { name: "OpenAI", revenue: "$18.4B", funding: "$57B+", staff: "6.8k", trend: "收入领先" },
-  { name: "Anthropic", revenue: "$6.2B", funding: "$25B+", staff: "2.9k", trend: "企业客户增长" },
-  { name: "xAI", revenue: "$1.8B", funding: "$18B+", staff: "1.2k", trend: "算力扩张" },
-  { name: "Mistral AI", revenue: "$0.6B", funding: "$2.2B+", staff: "0.7k", trend: "欧洲开源生态" },
-];
-
-function CapabilityPanel() {
-  return (
-    <article className="epoch-panel capability-panel" id="capability-ranking">
-      <div className="epoch-panel-head"><div><p className="eyebrow">EPOCH CAPABILITIES INDEX</p><h4>知名 AI 能力排行</h4></div><span>166 Top ECI</span></div>
-      <div className="rank-list">{capabilityLeaders.map((item, index) => <div className="rank-row" key={item.name}><span>{index + 1}</span><div><strong>{item.name}</strong><small>{item.owner} · {item.type}</small></div><b>{item.score}</b><i style={{ width: `${(item.score / 166) * 100}%` }} /></div>)}</div>
-    </article>
-  );
-}
-
-function ComputeScatter() {
-  return (
-    <article className="epoch-panel compute-panel" id="model-compute">
-      <div className="epoch-panel-head"><div><p className="eyebrow">TRAINING COMPUTE</p><h4>知名 AI 模型训练算力</h4></div><span>代表模型</span></div>
-      <div className="compute-chart" role="img" aria-label="知名 AI 模型训练算力趋势散点图">
-        <svg viewBox="0 0 680 310" preserveAspectRatio="none">
-          {[54, 118, 182, 246].map((y) => <line key={y} x1="28" x2="660" y1={y} y2={y} className="grid-line" />)}
-          {[120, 245, 370, 495, 620].map((x) => <line key={x} x1={x} x2={x} y1="28" y2="276" className="grid-line" />)}
-          <path d="M34 268 C170 234 280 198 395 146 C485 105 560 72 650 42" fill="none" stroke="#6f8790" strokeDasharray="7 8" strokeWidth="2" />
-          {computePoints.map((point) => {
-            const x = 36 + ((point.year - 2012) / 14) * 608;
-            const y = 270 - (point.compute / 100) * 225;
-            return <g key={point.name}><circle cx={x} cy={y} r="7" fill="#52d6b0" fillOpacity=".72" stroke="#9df5df" /><text x={Math.min(x + 12, 575)} y={y - 9}>{point.name}</text></g>;
-          })}
-        </svg>
-        <div className="compute-axis"><span>2012</span><span>2017</span><span>2022</span><span>2026</span></div>
-      </div>
-    </article>
-  );
-}
 
 function DataCenterPanel() {
   return (
     <article className="epoch-panel data-center-panel" id="data-centers">
-      <div className="epoch-panel-head"><div><p className="eyebrow">AI DATA CENTERS</p><h4>数据中心</h4></div><span>H100-eq</span></div>
-      <div className="dc-summary"><div><strong>86</strong><span>站点覆盖</span></div><div><strong>13.6M</strong><span>H100 等效</span></div><div><strong>13.1GW</strong><span>IT Power</span></div></div>
-      <div className="dc-list">{dataCenterLeaders.map((item) => <div key={item.name}><div><strong>{item.name}</strong><small>{item.owner} · {item.location}</small></div><span>{item.value}k</span></div>)}</div>
-    </article>
-  );
-}
-
-function ChipOwnerPanel() {
-  const offset = chipOwners.reduce<Array<{ start: number; item: typeof chipOwners[number] }>>((acc, item) => {
-    const start = acc.length ? acc[acc.length - 1].start + acc[acc.length - 1].item.value : 0;
-    acc.push({ start, item });
-    return acc;
-  }, []);
-
-  return (
-    <article className="epoch-panel chip-panel" id="chip-owners">
-      <div className="epoch-panel-head"><div><p className="eyebrow">AI CHIP OWNERS</p><h4>芯片所有者</h4></div><span>H100 等效份额</span></div>
-      <div className="chip-ring" aria-label="芯片所有者份额图">
-        <svg viewBox="0 0 42 42">{offset.map(({ start, item }) => <circle key={item.name} cx="21" cy="21" r="15.9" fill="none" stroke={item.color} strokeWidth="6" strokeDasharray={`${item.value} ${100 - item.value}`} strokeDashoffset={25 - start} />)}</svg>
-        <strong>Top 5</strong>
+      <div className="epoch-panel-head"><div><p className="eyebrow">AI DATA CENTER RANKING</p><h4>AI数据中心算力排行</h4></div><span>日更观察</span></div>
+      <div className="ranking-tabs" aria-label="数据中心维度"><span className="active">算力</span><span>IT Power</span><span>成本</span></div>
+      <div className="dc-summary"><div><strong>86</strong><span>站点覆盖</span></div><div><strong>13.6M</strong><span>H100 等效总量</span></div><div><strong>13.1GW</strong><span>IT Power 总量</span></div></div>
+      <div className="ranking-table dc-ranking">
+        <div className="ranking-header"><span>数据中心</span><span>算力</span><span>IT Power</span><span>成本</span></div>
+        {dataCenterRankings.map((item, index) => <div className="ranking-row" key={item.name}><b>{index + 1}</b><div><strong>{item.name}</strong><small>{item.owner} · {item.country}</small></div><span>{item.compute}</span><span>{item.power}</span><span>{item.cost}</span></div>)}
       </div>
-      <div className="chip-legend">{chipOwners.map((item) => <span key={item.name}><i style={{ background: item.color }} />{item.name}<b>{item.value}%</b></span>)}</div>
     </article>
   );
 }
@@ -118,8 +47,8 @@ function ChipOwnerPanel() {
 function CompanyPanel() {
   return (
     <article className="epoch-panel company-panel" id="ai-companies">
-      <div className="epoch-panel-head"><div><p className="eyebrow">AI COMPANIES</p><h4>AI 公司</h4></div><span>Revenue / Funding</span></div>
-      <div className="company-table">{companySignals.map((item) => <div key={item.name}><strong>{item.name}</strong><span>{item.revenue}</span><span>{item.funding}</span><small>{item.trend}</small></div>)}</div>
+      <div className="epoch-panel-head"><div><p className="eyebrow">AI COMPANY RANKING</p><h4>AI公司排行</h4></div><span>5 个维度</span></div>
+      <div className="company-rank-grid">{companyRankingGroups.map((group) => <div className="company-rank-card" key={group.title}><div><strong>{group.title}</strong><small>{group.unit}</small></div>{group.items.map((item, index) => <p key={item.name}><b>{index + 1}</b><span>{item.name}</span><em>{item.value}</em></p>)}</div>)}</div>
     </article>
   );
 }
@@ -203,12 +132,9 @@ export default function Home() {
           <a className="nav-item active" href="#overview"><Sparkles />AI算力CPI</a>
           <a className="nav-item" href="#gpu"><Cpu />GPU租赁价格</a>
           <a className="nav-item" href="#ram"><Database />RAM内存指数</a>
-          <p className="nav-label nav-label-spaced">AI能力与基础设施</p>
-          <a className="nav-item" href="#capability-ranking"><Trophy />能力排行</a>
-          <a className="nav-item" href="#model-compute"><Brain />模型训练算力</a>
-          <a className="nav-item" href="#data-centers"><Server />数据中心</a>
-          <a className="nav-item" href="#chip-owners"><Network />芯片所有者</a>
-          <a className="nav-item" href="#ai-companies"><Building2 />AI公司</a>
+          <p className="nav-label nav-label-spaced">AI动态排行</p>
+          <a className="nav-item" href="#data-centers"><Server />AI数据中心</a>
+          <a className="nav-item" href="#ai-companies"><Building2 />AI公司排行</a>
           <p className="nav-label nav-label-spaced">TOOLS</p>
           <a className="nav-item" href="#watch"><Star />自选</a>
           <a className="nav-item" href="#alerts"><Bell />价格预警<span className="nav-count">3</span></a>
@@ -256,24 +182,21 @@ export default function Home() {
 
           <section id="ai-landscape" className="section-block epoch-workspace">
             <div className="section-head landscape-head">
-              <div><p className="eyebrow">AI CAPABILITY & INFRASTRUCTURE</p><h3>AI能力与基础设施</h3></div>
-              <div className="landscape-tabs" aria-label="数据视图"><span className="active">图表</span><span>表格</span><span>地图</span></div>
+              <div><p className="eyebrow">AI INFRASTRUCTURE & COMPANY RANKING</p><h3>AI动态排行</h3></div>
+              <div className="landscape-tabs" aria-label="数据视图"><span className="active">排行</span><span>趋势</span><span>明细</span></div>
             </div>
             <div className="landscape-hero">
-              <div><h3>从模型能力、训练算力到数据中心和公司经营，追踪 AI 产业扩张的关键变量。</h3><small className="source-note">数据参考：Epoch AI</small></div>
-              <div className="landscape-stats"><span><strong>5</strong>数据模块</span><span><strong>3.6k+</strong>模型库</span><span><strong>86</strong>数据中心</span></div>
+              <div><h3>聚焦更动态的基础设施与公司经营数据，跟踪 AI 算力供给、资本投入与商业化变化。</h3><small className="source-note">数据参考：Epoch AI 历史数据</small></div>
+              <div className="landscape-stats"><span><strong>2</strong>数据模块</span><span><strong>3</strong>数据中心维度</span><span><strong>5</strong>公司排行维度</span></div>
             </div>
             <div className="epoch-grid">
-              <CapabilityPanel />
-              <ComputeScatter />
               <DataCenterPanel />
-              <ChipOwnerPanel />
               <CompanyPanel />
             </div>
           </section>
         </main>
       </div>
-      <nav className="mobile-nav" aria-label="移动端导航"><a className="active" href="#overview"><HomeIcon /><span>CPI</span></a><a href="#gpu"><Cpu /><span>GPU</span></a><a href="#ram"><Database /><span>RAM</span></a><a href="#ai-landscape"><BarChart3 /><span>能力</span></a><a href="#alerts"><Bell /><span>预警</span></a></nav>
+      <nav className="mobile-nav" aria-label="移动端导航"><a className="active" href="#overview"><HomeIcon /><span>CPI</span></a><a href="#gpu"><Cpu /><span>GPU</span></a><a href="#ram"><Database /><span>RAM</span></a><a href="#ai-landscape"><BarChart3 /><span>排行</span></a><a href="#alerts"><Bell /><span>预警</span></a></nav>
     </div>
   );
 }
