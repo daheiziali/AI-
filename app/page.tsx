@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Activity, ArrowRight, BarChart3, Bell, Building2, ChevronDown, Command, Cpu, Database,
+  Activity, ArrowRight, BarChart3, Bell, ChevronDown, Command, Cpu, Database,
   Home as HomeIcon, Menu, Search, Server, Settings, Sparkles, Star, TrendingDown, TrendingUp,
 } from "lucide-react";
 import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
@@ -14,52 +14,92 @@ import { tokenHistory } from "@/app/data/token-history";
 const historyRanges = { "7D": 7, "30D": 30, "90D": 90, "全部": Infinity } as const;
 type HistoryRange = keyof typeof historyRanges;
 
-const dataCenterRankings = [
-  { name: "Colossus 2", owner: "SpaceXAI", country: "United States", compute: "1.11M", power: "946MW", cost: "$35.8B" },
-  { name: "Microsoft Fairwater Atlanta", owner: "Microsoft", country: "United States", compute: "769k", power: "636MW", cost: "$24.1B" },
-  { name: "Anthropic-Amazon New Carlisle", owner: "Amazon", country: "United States", compute: "686k", power: "910MW", cost: "$34.5B" },
-  { name: "Meta Prometheus", owner: "Meta", country: "United States", compute: "680k", power: "562MW", cost: "$21.3B" },
-  { name: "Google Pryor North", owner: "Google", country: "United States", compute: "637k", power: "368MW", cost: "$13.9B" },
-  { name: "OpenAI Stargate Abilene", owner: "Oracle", country: "United States", compute: "509k", power: "421MW", cost: "$15.9B" },
-];
+type DataCenterMetric = "compute" | "power" | "cost";
 
-const companyRankingGroups = [
-  { title: "营收排行", unit: "Annualized revenue", items: [{ name: "Anthropic", value: "$65.0B" }, { name: "OpenAI", value: "$40.0B" }, { name: "Z.ai", value: "$1.6B" }] },
-  { title: "融资排行", unit: "Total equity funding", items: [{ name: "OpenAI", value: "$182.8B" }, { name: "Anthropic", value: "$139.4B" }, { name: "xAI", value: "$37.0B" }] },
-  { title: "人员排行", unit: "Staff reports", items: [{ name: "Google", value: "6.0k" }, { name: "OpenAI", value: "4.5k" }, { name: "Meta", value: "3.4k" }] },
-  { title: "用户排行", unit: "Active users", items: [{ name: "Meta", value: "1.0B MAU" }, { name: "OpenAI", value: "920M WAU" }, { name: "Google", value: "650M MAU" }] },
-  { title: "算力成本", unit: "Compute spend", items: [{ name: "Anthropic", value: "$13.6B" }, { name: "OpenAI", value: "$8.3B" }] },
+const dataCenterMetrics: Record<DataCenterMetric, { label: string; short: string; unit: string }> = {
+  compute: { label: "算力", short: "H100 等效", unit: "H100e" },
+  power: { label: "IT 实力", short: "IT Power", unit: "MW" },
+  cost: { label: "成本", short: "建设成本", unit: "USD" },
+};
+
+const dataCenterRankings = [
+  { name: "Colossus 2", owner: "xAI", country: "United States", year: "2026", compute: 1110, power: 946, cost: 35.8, computeLabel: "1.11M", powerLabel: "946MW", costLabel: "$35.8B" },
+  { name: "Microsoft Fairwater Atlanta", owner: "Microsoft", country: "United States", year: "2026", compute: 769, power: 636, cost: 24.1, computeLabel: "769k", powerLabel: "636MW", costLabel: "$24.1B" },
+  { name: "Anthropic-Amazon New Carlisle", owner: "Amazon", country: "United States", year: "2026", compute: 686, power: 910, cost: 34.5, computeLabel: "686k", powerLabel: "910MW", costLabel: "$34.5B" },
+  { name: "Meta Prometheus", owner: "Meta", country: "United States", year: "2026", compute: 680, power: 562, cost: 21.3, computeLabel: "680k", powerLabel: "562MW", costLabel: "$21.3B" },
+  { name: "Google Pryor North", owner: "Google", country: "United States", year: "2026", compute: 637, power: 368, cost: 13.9, computeLabel: "637k", powerLabel: "368MW", costLabel: "$13.9B" },
+  { name: "OpenAI Stargate Abilene", owner: "Oracle", country: "United States", year: "2026", compute: 509, power: 421, cost: 15.9, computeLabel: "509k", powerLabel: "421MW", costLabel: "$15.9B" },
+  { name: "Meta Hyperion", owner: "Meta", country: "United States", year: "2025", compute: 402, power: 351, cost: 11.6, computeLabel: "402k", powerLabel: "351MW", costLabel: "$11.6B" },
+  { name: "Google Fort Wayne", owner: "Google", country: "United States", year: "2025", compute: 365, power: 285, cost: 9.8, computeLabel: "365k", powerLabel: "285MW", costLabel: "$9.8B" },
+  { name: "Microsoft Wisconsin AI Zone", owner: "Microsoft", country: "United States", year: "2025", compute: 352, power: 328, cost: 10.4, computeLabel: "352k", powerLabel: "328MW", costLabel: "$10.4B" },
+  { name: "CoreWeave Lancaster", owner: "CoreWeave", country: "United States", year: "2025", compute: 286, power: 274, cost: 7.8, computeLabel: "286k", powerLabel: "274MW", costLabel: "$7.8B" },
+  { name: "Oracle Salt Lake AI", owner: "Oracle", country: "United States", year: "2024", compute: 248, power: 212, cost: 6.2, computeLabel: "248k", powerLabel: "212MW", costLabel: "$6.2B" },
+  { name: "Tesla Cortex", owner: "Tesla", country: "United States", year: "2024", compute: 216, power: 186, cost: 5.1, computeLabel: "216k", powerLabel: "186MW", costLabel: "$5.1B" },
 ];
 
 function DataCenterPanel() {
+  const [metric, setMetric] = useState<DataCenterMetric>("compute");
+  const [expanded, setExpanded] = useState(false);
+  const ranked = [...dataCenterRankings].sort((a, b) => b[metric] - a[metric]);
+  const visible = expanded ? ranked : ranked.slice(0, 10);
+  const max = ranked[0][metric];
+  const labelFor = (item: (typeof dataCenterRankings)[number]) => metric === "compute" ? item.computeLabel : metric === "power" ? item.powerLabel : item.costLabel;
+  const axisMax = metric === "compute" ? "1.5M" : metric === "power" ? "1GW" : "$40B";
+  const axisMid = metric === "compute" ? "750K" : metric === "power" ? "500MW" : "$20B";
+
   return (
     <article className="epoch-panel data-center-panel" id="data-centers">
       <div className="epoch-panel-head"><div><p className="eyebrow">AI DATA CENTER RANKING</p><h4>AI数据中心算力排行</h4></div><span>日更观察</span></div>
-      <div className="ranking-tabs" aria-label="数据中心维度"><span className="active">算力</span><span>IT Power</span><span>成本</span></div>
-      <div className="dc-summary"><div><strong>86</strong><span>站点覆盖</span></div><div><strong>13.6M</strong><span>H100 等效总量</span></div><div><strong>13.1GW</strong><span>IT Power 总量</span></div></div>
-      <div className="ranking-table dc-ranking">
-        <div className="ranking-header"><span>数据中心</span><span>算力</span><span>IT Power</span><span>成本</span></div>
-        {dataCenterRankings.map((item, index) => <div className="ranking-row" key={item.name}><b>{index + 1}</b><div><strong>{item.name}</strong><small>{item.owner} · {item.country}</small></div><span>{item.compute}</span><span>{item.power}</span><span>{item.cost}</span></div>)}
+      <div className="ranking-tabs dc-tabs" aria-label="数据中心维度">{(Object.keys(dataCenterMetrics) as DataCenterMetric[]).map((key) => <button key={key} className={metric === key ? "active" : ""} onClick={() => setMetric(key)}>{dataCenterMetrics[key].label}</button>)}</div>
+      <div className="dc-chart-title">
+        <h5>AI数据中心按{dataCenterMetrics[metric].label}排行</h5>
+        <p>{metric === "compute" ? "参照 H100 等效算力口径，展示主要 AI 数据中心的相对规模。" : metric === "power" ? "以 IT Power 观察数据中心可承载的基础设施能力。" : "以估算建设成本观察大型 AI 数据中心的资本投入规模。"}</p>
       </div>
+      <div className="dc-summary"><div><strong>86</strong><span>站点覆盖</span></div><div><strong>13.6M</strong><span>H100 等效总量</span></div><div><strong>13.1GW</strong><span>IT Power 总量</span></div></div>
+      <div className="dc-chart-scroll">
+        <div className="dc-bar-chart">
+          <div className="dc-axis-title">{dataCenterMetrics[metric].short}（{dataCenterMetrics[metric].unit}）</div>
+          <div className="dc-value-axis"><span>0</span><span>{axisMid}</span><span>{axisMax}</span></div>
+          <div className="dc-bars" aria-label={`${dataCenterMetrics[metric].label}排行`}>
+            {visible.map((item, index) => (
+              <div className="dc-bar-row" key={`${metric}-${item.name}`}>
+                <div className="dc-bar-name"><b>{index + 1}</b><span>{item.name}<small>{item.owner} · {item.year}</small></span></div>
+                <div className="dc-bar-lane">
+                  <i style={{ width: `${Math.max(8, (item[metric] / max) * 100)}%` }} />
+                  <strong>{labelFor(item)}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="dc-time-axis">
+            <button aria-label="播放时间轴"><span /></button>
+            <div><strong>Q1 2023</strong><i><em style={{ left: "50%" }} /></i><strong>Q1 2030</strong></div>
+          </div>
+          <div className="dc-year-axis"><span>2023</span><span>2024</span><span>2025</span><span>Today</span><span>2027</span><span>2028</span><span>2029</span><span>2030</span></div>
+        </div>
+      </div>
+      <div className="dc-panel-actions"><button onClick={() => setExpanded((current) => !current)}>{expanded ? "收起" : "展开全部"} <ArrowRight /></button></div>
     </article>
   );
 }
 
-function CompanyPanel() {
+const modelLogoText = (name: string) => name.split(/[\s.-]+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+
+function ModelLogo({ name, provider }: { name: string; provider: string }) {
   return (
-    <article className="epoch-panel company-panel" id="ai-companies">
-      <div className="epoch-panel-head"><div><p className="eyebrow">AI COMPANY RANKING</p><h4>AI公司排行</h4></div><span>5 个维度</span></div>
-      <div className="company-rank-grid">{companyRankingGroups.map((group) => <div className="company-rank-card" key={group.title}><div><strong>{group.title}</strong><small>{group.unit}</small></div>{group.items.map((item, index) => <p key={item.name}><b>{index + 1}</b><span>{item.name}</span><em>{item.value}</em></p>)}</div>)}</div>
-    </article>
+    <span className={`model-logo provider-${provider.replace(/[^a-z0-9]/g, "")}`}>{modelLogoText(name)}</span>
   );
 }
 
 function LlmModelPanel({ window, setWindow }: { window: ModelRankingWindow; setWindow: (value: ModelRankingWindow) => void }) {
+  const [expanded, setExpanded] = useState(false);
   const models = getRankedModels(window);
+  const visible = expanded ? models : models.slice(0, 20);
+  const columns = [visible.filter((_, index) => index % 2 === 0), visible.filter((_, index) => index % 2 === 1)];
   return (
     <article className="epoch-panel model-panel" id="llm-models">
       <div className="epoch-panel-head">
-        <div><p className="eyebrow">LLM MODEL RANKING</p><h4>LLM模型排行榜</h4></div>
+        <div><p className="eyebrow">LLM MODEL RANKING</p><h4>LLM模型算力消耗排行</h4></div>
         <span>OpenRouter</span>
       </div>
       <div className="model-ranking-top">
@@ -68,18 +108,25 @@ function LlmModelPanel({ window, setWindow }: { window: ModelRankingWindow; setW
         </Tabs>
         <p>按 Token 消耗量排序，默认展示最近完整日数据。</p>
       </div>
-      <div className="ranking-table model-ranking-table">
-        <div className="ranking-header model-ranking-header"><span>模型</span><span>Token 消耗</span><span>变化</span><span>详情</span></div>
-        {models.map((model, index) => (
-          <div className="ranking-row model-ranking-row" key={model.slug}>
-            <b>{index + 1}</b>
-            <div><strong>{model.name}</strong><small>{model.providerLabel}</small></div>
-            <span>{model.ranking[window].display}</span>
-            <span className={model.ranking[window].change >= 0 ? "positive" : "negative"}>{model.ranking[window].change >= 0 ? "+" : ""}{model.ranking[window].change}%</span>
-            <a href={`/models/${model.slug}`}>详情 <ArrowRight /></a>
+      <div className="model-board">
+        {columns.map((column, columnIndex) => (
+          <div className="model-column" key={columnIndex}>
+            {column.map((model, localIndex) => {
+              const rank = localIndex * 2 + columnIndex + 1;
+              return (
+                <a className="model-board-row" href={`/models/${model.slug}`} key={model.slug}>
+                  <b>{rank}</b>
+                  <ModelLogo name={model.name} provider={model.provider} />
+                  <span><strong>{model.name}</strong><small>{model.providerLabel}</small></span>
+                  <em>{model.ranking[window].display}</em>
+                  <i className={model.ranking[window].change >= 0 ? "positive" : "negative"}>{model.ranking[window].change >= 0 ? "+" : ""}{model.ranking[window].change}%</i>
+                </a>
+              );
+            })}
           </div>
         ))}
       </div>
+      {models.length > 20 && <div className="dc-panel-actions"><button onClick={() => setExpanded((current) => !current)}>{expanded ? "收起" : "展示全部"} <ArrowRight /></button></div>}
     </article>
   );
 }
@@ -166,7 +213,6 @@ export default function Home() {
           <a className="nav-item" href="#ram"><Database />RAM内存指数</a>
           <p className="nav-label nav-label-spaced">AI动态排行</p>
           <a className="nav-item" href="#data-centers"><Server />AI数据中心</a>
-          <a className="nav-item" href="#ai-companies"><Building2 />AI公司排行</a>
           <a className="nav-item" href="#llm-models"><BarChart3 />LLM模型排行</a>
           <p className="nav-label nav-label-spaced">TOOLS</p>
           <a className="nav-item" href="#watch"><Star />自选</a>
@@ -215,16 +261,15 @@ export default function Home() {
 
           <section id="ai-landscape" className="section-block epoch-workspace">
             <div className="section-head landscape-head">
-              <div><p className="eyebrow">AI INFRASTRUCTURE & COMPANY RANKING</p><h3>AI动态排行</h3></div>
+              <div><p className="eyebrow">AI INFRASTRUCTURE & MODEL RANKING</p><h3>AI动态排行</h3></div>
               <div className="landscape-tabs" aria-label="数据视图"><span className="active">排行</span><span>趋势</span><span>明细</span></div>
             </div>
             <div className="landscape-hero">
-              <div><h3>聚焦更动态的基础设施、公司经营与模型调用数据，跟踪 AI 算力供给、资本投入与推理流量变化。</h3><small className="source-note">数据参考：Epoch AI 历史数据、OpenRouter 模型排行</small></div>
-              <div className="landscape-stats"><span><strong>3</strong>数据模块</span><span><strong>3</strong>数据中心维度</span><span><strong>3</strong>模型时间窗口</span></div>
+              <div><h3>聚焦更动态的基础设施与模型调用数据，跟踪 AI 算力供给、资本投入与推理流量变化。</h3><small className="source-note">数据参考：Epoch AI 历史数据、OpenRouter 模型排行</small></div>
+              <div className="landscape-stats"><span><strong>2</strong>数据模块</span><span><strong>3</strong>数据中心维度</span><span><strong>3</strong>模型时间窗口</span></div>
             </div>
             <div className="epoch-grid">
               <DataCenterPanel />
-              <CompanyPanel />
               <LlmModelPanel window={modelWindow} setWindow={setModelWindow} />
             </div>
           </section>
