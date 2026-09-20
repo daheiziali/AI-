@@ -19,7 +19,7 @@ export default async function IndexDetailPage({ params }: { params: Promise<{ sl
   return (
     <div className="detail-page">
       <header className="detail-topbar">
-        <a className="detail-brand" href="/"><span className="brand-mark"><LineChart /></span><strong>算力温度计</strong></a>
+        <a className="detail-brand" href="/"><span className="brand-mark"><LineChart /></span><strong>AI Dashboard</strong></a>
         <a className="detail-back" href="/"><ArrowLeft />返回总览</a>
       </header>
 

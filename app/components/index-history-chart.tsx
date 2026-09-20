@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ranges = { "7D": 7, "30D": 30, "90D": 90, "全部": Infinity } as const;
@@ -8,6 +8,7 @@ type Range = keyof typeof ranges;
 
 export function IndexHistoryChart({ history, name }: { history: Array<{ date: string; value: number }>; name: string }) {
   const [range, setRange] = useState<Range>("7D");
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const visible = useMemo(() => {
     const days = ranges[range];
     if (!Number.isFinite(days)) return history;
@@ -30,6 +31,12 @@ export function IndexHistoryChart({ history, name }: { history: Array<{ date: st
   const labels = [0, 0.25, 0.5, 0.75, 1].map((ratio) => visible[Math.round((visible.length - 1) * ratio)]);
   const start = visible.at(0)?.date.replaceAll("-", ".");
   const end = visible.at(-1)?.date.replaceAll("-", ".");
+  const selected = hoveredIndex === null ? points.at(-1) : points[hoveredIndex];
+  const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width));
+    setHoveredIndex(Math.round(ratio * (points.length - 1)));
+  };
 
   return (
     <>
@@ -41,14 +48,15 @@ export function IndexHistoryChart({ history, name }: { history: Array<{ date: st
       </div>
       <div className="detail-chart-wrap">
         <div className="detail-y"><span>{chartMax.toFixed(2)}</span><span>{((chartMax + chartMin) / 2).toFixed(2)}</span><span>{chartMin.toFixed(2)}</span></div>
-        <svg viewBox="0 0 920 270" preserveAspectRatio="none" role="img" aria-label={`${name} ${range} 历史走势`}>
+        <svg viewBox="0 0 920 270" preserveAspectRatio="none" role="img" aria-label={`${name} ${range} 历史走势`} onPointerMove={handlePointerMove} onPointerLeave={() => setHoveredIndex(null)}>
           <defs><linearGradient id="detail-index-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#52d6b0" stopOpacity="0.25" /><stop offset="1" stopColor="#52d6b0" stopOpacity="0" /></linearGradient></defs>
           {[40, 145, 250].map((y) => <line key={y} x1="0" y1={y} x2="920" y2={y} className="grid-line" />)}
           <polygon points={`0,260 ${line} 920,260`} fill="url(#detail-index-area)" />
           <polyline points={line} fill="none" stroke="#52d6b0" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
-          <line x1="920" y1="30" x2="920" y2="260" stroke="#52d6b0" strokeDasharray="4 5" opacity=".45" />
-          <circle cx={points.at(-1)?.x} cy={points.at(-1)?.y} r="5" fill="#08120f" stroke="#52d6b0" strokeWidth="2.5" />
+          {hoveredIndex !== null && <line x1={selected?.x} y1="30" x2={selected?.x} y2="260" stroke="#78e2c3" strokeDasharray="3 4" opacity=".65" />}
+          <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#08120f" stroke="#78e2c3" strokeWidth="2.5" />
         </svg>
+        {hoveredIndex !== null && selected && <div className={`chart-tooltip detail-tooltip ${selected.x > 736 ? "align-right" : ""}`} style={{ left: `${(selected.x / 920) * 100}%`, top: `${(selected.y / 270) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>{name}</small></div>}
         <div className="detail-x">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{point.date.replaceAll("-", ".")}</span>)}</div>
         <div className="detail-chart-stats"><span>{visible.length} 个数据点</span><span>区间最低 <b>${min.toFixed(3)}</b></span><span>区间最高 <b>${max.toFixed(3)}</b></span></div>
       </div>

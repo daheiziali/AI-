@@ -4,7 +4,7 @@ import {
   Activity, ArrowRight, Bell, ChevronDown, Command, Cpu, Database, Home as HomeIcon, LayoutDashboard,
   Menu, Search, Settings, SlidersHorizontal, Sparkles, Star, TrendingDown, TrendingUp,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { gpuIndices, ramIndices, tokenIndices, type IndexDefinition } from "@/app/data/indices";
@@ -15,6 +15,7 @@ type HistoryRange = keyof typeof historyRanges;
 
 function TokenHistoryChart() {
   const [range, setRange] = useState<HistoryRange>("30D");
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const visible = useMemo(() => {
     const days = historyRanges[range];
     if (!Number.isFinite(days)) return tokenHistory;
@@ -36,6 +37,12 @@ function TokenHistoryChart() {
   const line = points.map((point) => `${point.x},${point.y}`).join(" ");
   const labels = [0, 0.25, 0.5, 0.75, 1].map((ratio) => visible[Math.min(visible.length - 1, Math.round((visible.length - 1) * ratio))]);
   const formatDate = (date: string) => date.slice(5).replace("-", "/");
+  const selected = hoveredIndex === null ? points.at(-1) : points[hoveredIndex];
+  const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width));
+    setHoveredIndex(Math.round(ratio * (points.length - 1)));
+  };
 
   return (
     <div className="history-chart">
@@ -45,14 +52,15 @@ function TokenHistoryChart() {
       </div>
       <div className="history-plot">
         <div className="history-y" aria-hidden="true"><span>{chartMax.toFixed(2)}</span><span>{((chartMax + chartMin) / 2).toFixed(2)}</span><span>{chartMin.toFixed(2)}</span></div>
-        <svg viewBox="0 0 760 225" preserveAspectRatio="none" role="img" aria-label={`AI算力CPI ${range} 历史价格走势，最新值 ${points.at(-1)?.value.toFixed(4)}`}>
+        <svg viewBox="0 0 760 225" preserveAspectRatio="none" role="img" aria-label={`AI算力CPI ${range} 历史价格走势，最新值 ${points.at(-1)?.value.toFixed(4)}`} onPointerMove={handlePointerMove} onPointerLeave={() => setHoveredIndex(null)}>
           <defs><linearGradient id="token-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#52d6b0" stopOpacity="0.22" /><stop offset="1" stopColor="#52d6b0" stopOpacity="0" /></linearGradient></defs>
           {[30, 117.5, 205].map((y) => <line key={y} x1="0" y1={y} x2="760" y2={y} className="grid-line" />)}
           <polygon points={`0,215 ${line} 760,215`} fill="url(#token-area)" />
           <polyline points={line} fill="none" stroke="#52d6b0" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
-          <line x1="760" y1="20" x2="760" y2="215" stroke="#52d6b0" strokeDasharray="4 5" opacity=".45" />
-          <circle cx={points.at(-1)?.x} cy={points.at(-1)?.y} r="4.5" fill="#08120f" stroke="#52d6b0" strokeWidth="2.5" />
+          {hoveredIndex !== null && <line x1={selected?.x} y1="20" x2={selected?.x} y2="215" stroke="#78e2c3" strokeDasharray="3 4" opacity=".65" />}
+          <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#08120f" stroke="#78e2c3" strokeWidth="2.5" />
         </svg>
+        {hoveredIndex !== null && selected && <div className={`chart-tooltip ${selected.x > 600 ? "align-right" : ""}`} style={{ left: `${(selected.x / 760) * 100}%`, top: `${(selected.y / 225) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>USD / 百万 Tokens</small></div>}
         <div className="history-x" aria-hidden="true">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{formatDate(point.date)}</span>)}</div>
       </div>
       <div className="chart-summary"><span>{visible.length} 个观测值</span><span>区间最低 <b>${min.toFixed(3)}</b></span><span>区间最高 <b>${max.toFixed(3)}</b></span></div>
@@ -78,13 +86,12 @@ export default function Home() {
   return (
     <div className="app-frame">
       <aside className={`sidebar ${navOpen ? "is-open" : ""}`}>
-        <div className="brand"><span className="brand-mark"><Activity /></span><span>算力温度计</span></div>
+        <div className="brand"><span className="brand-mark"><Activity /></span><span>AI Dashboard</span></div>
         <nav aria-label="主要导航">
-          <p className="nav-label">WORKSPACE</p>
-          <a className="nav-item active" href="#overview"><LayoutDashboard />总览</a>
-          <a className="nav-item" href="#gpu"><Cpu />GPU 指数</a>
-          <a className="nav-item" href="#token"><Sparkles />AI算力CPI</a>
-          <a className="nav-item" href="#ram"><Database />RAM 指数</a>
+          <p className="nav-label">AI算力市场</p>
+          <a className="nav-item active" href="#overview"><Sparkles />AI算力CPI</a>
+          <a className="nav-item" href="#gpu"><Cpu />GPU租赁价格</a>
+          <a className="nav-item" href="#ram"><Database />RAM内存指数</a>
           <p className="nav-label nav-label-spaced">TOOLS</p>
           <a className="nav-item" href="#watch"><Star />自选</a>
           <a className="nav-item" href="#alerts"><Bell />价格预警<span className="nav-count">3</span></a>
@@ -122,9 +129,16 @@ export default function Home() {
             <div className="section-head"><div><p className="eyebrow">MEMORY MARKET</p><h3>RAM内存指数</h3></div></div>
             <div className="index-grid ram-grid">{ramIndices.map(renderIndexCard)}</div>
           </section>
+
+          <section id="ai-brief" className="section-block ai-brief">
+            <div className="ai-brief-head"><div><p className="eyebrow">AI MARKET INTERPRETATION</p><h3><Sparkles />AI算力解读</h3></div><span>基于全部 11 个指数 · 2026.09.19</span></div>
+            <div className="ai-brief-summary"><strong>推理价格短期反弹，GPU 与显存成本整体偏强</strong><p>LLM Token支出指数近7日上涨 3.4%，但开源与闭源市场出现明显分化。GPU 租赁指数多数上涨，RAM价格同步走强，当前算力成本压力主要集中在闭源推理与高端硬件环节。</p></div>
+            <div className="ai-brief-grid"><div><span>推理成本</span><strong>开源下降，闭源上涨</strong><p>开源LLM Token支出下降 5.3%，闭源指数上涨 3.5%，两类模型的成本走势分化。</p></div><div><span>GPU租赁</span><strong>高端型号普遍偏强</strong><p>H200、B200 与 MI300X 均录得上涨，H200近7日涨幅在GPU指数中居前。</p></div><div><span>内存市场</span><strong>GDDR6价格上涨</strong><p>RAM内存指数近7日上涨 1.0%，硬件成本尚未出现同步回落。</p></div></div>
+            <p className="ai-brief-note">本解读仅依据当前看板数据生成，不对未接入的新闻、供需事件作原因判断。</p>
+          </section>
         </main>
       </div>
-      <nav className="mobile-nav" aria-label="移动端导航"><a className="active" href="#overview"><HomeIcon /><span>总览</span></a><a href="#gpu"><Cpu /><span>指数</span></a><a href="#watch"><Star /><span>自选</span></a><a href="#alerts"><Bell /><span>预警</span></a><a href="#settings"><SlidersHorizontal /><span>我的</span></a></nav>
+      <nav className="mobile-nav" aria-label="移动端导航"><a className="active" href="#overview"><HomeIcon /><span>CPI</span></a><a href="#gpu"><Cpu /><span>GPU</span></a><a href="#ram"><Database /><span>RAM</span></a><a href="#watch"><Star /><span>自选</span></a><a href="#alerts"><Bell /><span>预警</span></a></nav>
     </div>
   );
 }
