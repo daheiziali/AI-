@@ -54,7 +54,6 @@ export function IndexAlertDialog({ name, value, unit }: { name: string; value: s
           </div><small>{mode === "price" ? "“穿越”仅在指数从阈值一侧越过时触发，适合避免连续重复提醒。" : "按最近 7 个更新日的累计涨跌幅计算。"}</small></label>
           <label className="switch-row"><span><strong>触发一次后暂停</strong><small>需要时可在预警列表中重新启用</small></span><Switch checked={pauseAfterTrigger} onCheckedChange={setPauseAfterTrigger} /></label>
           <label className="switch-row"><span><strong>App 推送</strong><small>指数更新后发送</small></span><Switch defaultChecked /></label>
-          <label className="switch-row"><span><strong>邮件摘要</strong><small>工作日更新后发送</small></span><Switch defaultChecked /></label>
         </div>}
         <DialogFooter>{!saved && <Button onClick={() => setSaved(true)}>保存预警</Button>}</DialogFooter>
       </DialogContent>
