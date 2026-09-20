@@ -9,8 +9,11 @@ type Range = keyof typeof ranges;
 export function IndexHistoryChart({ history, name }: { history: Array<{ date: string; value: number }>; name: string }) {
   const [range, setRange] = useState<Range>("7D");
   const visible = useMemo(() => {
-    const count = ranges[range];
-    return Number.isFinite(count) ? history.slice(-count) : history;
+    const days = ranges[range];
+    if (!Number.isFinite(days)) return history;
+    const latest = new Date(`${history.at(-1)?.date}T00:00:00Z`).getTime();
+    const cutoff = latest - (days - 1) * 86400000;
+    return history.filter((point) => new Date(`${point.date}T00:00:00Z`).getTime() >= cutoff);
   }, [history, range]);
   const values = visible.map((point) => point.value);
   const min = Math.min(...values);
@@ -38,7 +41,7 @@ export function IndexHistoryChart({ history, name }: { history: Array<{ date: st
       </div>
       <div className="detail-chart-wrap">
         <div className="detail-y"><span>{chartMax.toFixed(2)}</span><span>{((chartMax + chartMin) / 2).toFixed(2)}</span><span>{chartMin.toFixed(2)}</span></div>
-        <svg viewBox="0 0 920 270" role="img" aria-label={`${name} ${range} 历史走势`}>
+        <svg viewBox="0 0 920 270" preserveAspectRatio="none" role="img" aria-label={`${name} ${range} 历史走势`}>
           <defs><linearGradient id="detail-index-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#52d6b0" stopOpacity="0.25" /><stop offset="1" stopColor="#52d6b0" stopOpacity="0" /></linearGradient></defs>
           {[40, 145, 250].map((y) => <line key={y} x1="0" y1={y} x2="920" y2={y} className="grid-line" />)}
           <polygon points={`0,260 ${line} 920,260`} fill="url(#detail-index-area)" />
