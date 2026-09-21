@@ -8,6 +8,7 @@ import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CrossMarketSignals } from "@/app/components/cross-market-signals";
+import { MemoryMarketBoard } from "@/app/components/memory-market-board";
 import { gpuIndices, ramIndices, tokenIndices, type IndexDefinition } from "@/app/data/indices";
 import { getRankedModels, modelRankingWindows, type ModelRankingWindow } from "@/app/data/llm-models";
 import { tokenHistory } from "@/app/data/token-history";
@@ -206,7 +207,7 @@ export default function Home() {
           <p className="nav-label">AI算力市场</p>
           <a className="nav-item active" href="#overview"><Sparkles />AI算力CPI</a>
           <a className="nav-item" href="#gpu"><Cpu />GPU租赁价格</a>
-          <a className="nav-item" href="#ram"><Database />RAM内存指数</a>
+          <a className="nav-item" href="#ram"><Database />内存与存储价格</a>
           <a className="nav-item" href="#cross-market"><Activity />跨市场信号</a>
           <p className="nav-label nav-label-spaced">AI排行榜</p>
           <a className="nav-item" href="#data-centers"><Server />AI数据中心</a>
@@ -245,8 +246,11 @@ export default function Home() {
           </section>
 
           <section id="ram" className="section-block">
-            <div className="section-head"><div><p className="eyebrow">MEMORY MARKET</p><h3>RAM内存指数</h3></div></div>
-            <div className="index-grid ram-grid">{ramIndices.map(renderIndexCard)}</div>
+            <div className="section-head"><div><p className="eyebrow">MEMORY & STORAGE MARKET</p><h3>内存与存储价格</h3></div></div>
+            <div className="memory-market-layout">
+              <div className="memory-benchmark"><p>综合基准</p>{ramIndices.map(renderIndexCard)}</div>
+              <MemoryMarketBoard />
+            </div>
           </section>
 
           <section id="ai-brief" className="section-block ai-brief">
@@ -269,7 +273,7 @@ export default function Home() {
           </section>
         </main>
       </div>
-      <nav className="mobile-nav" aria-label="移动端导航"><a className="active" href="#overview"><HomeIcon /><span>CPI</span></a><a href="#gpu"><Cpu /><span>GPU</span></a><a href="#ram"><Database /><span>RAM</span></a><a href="#ai-landscape"><BarChart3 /><span>排行</span></a><a href="#alerts"><Bell /><span>预警</span></a></nav>
+      <nav className="mobile-nav" aria-label="移动端导航"><a className="active" href="#overview"><HomeIcon /><span>CPI</span></a><a href="#gpu"><Cpu /><span>GPU</span></a><a href="#ram"><Database /><span>内存</span></a><a href="#ai-landscape"><BarChart3 /><span>排行</span></a><a href="#alerts"><Bell /><span>预警</span></a></nav>
     </div>
   );
 }
