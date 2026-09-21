@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowUpRight, CalendarDays, Clock3, Database, LineChart, TrendingDown, TrendingUp } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IndexAlertDialog } from "@/app/components/index-alert-dialog";
 import { IndexHistoryChart } from "@/app/components/index-history-chart";
@@ -19,8 +20,8 @@ export default async function IndexDetailPage({ params }: { params: Promise<{ sl
   return (
     <div className="detail-page">
       <header className="detail-topbar">
-        <a className="detail-brand" href="/"><span className="brand-mark"><LineChart /></span><strong>AI Dashboard</strong></a>
-        <a className="detail-back" href="/"><ArrowLeft />返回总览</a>
+        <Link className="detail-brand" href="/"><span className="brand-mark"><LineChart /></span><strong>AI Dashboard</strong></Link>
+        <Link className="detail-back" href="/"><ArrowLeft />返回总览</Link>
       </header>
 
       <main className="detail-content">
@@ -42,7 +43,7 @@ export default async function IndexDetailPage({ params }: { params: Promise<{ sl
 
         <section className="detail-about"><p className="eyebrow">ABOUT THIS INDEX</p><h2>指数说明</h2><p>{item.description}</p></section>
 
-        {related.length > 0 && <section className="detail-related"><p className="eyebrow">RELATED INDICES</p><h2>同类指数</h2><div>{related.map((candidate) => <a key={candidate.slug} href={`/indices/${candidate.slug}`}><span>{candidate.name}<small>{candidate.code}</small></span><strong>{candidate.value}</strong><ArrowUpRight /></a>)}</div></section>}
+        {related.length > 0 && <section className="detail-related"><p className="eyebrow">RELATED INDICES</p><h2>同类指数</h2><div>{related.map((candidate) => <Link key={candidate.slug} href={`/indices/${candidate.slug}`}><span>{candidate.name}<small>{candidate.code}</small></span><strong>{candidate.value}</strong><ArrowUpRight /></Link>)}</div></section>}
       </main>
     </div>
   );

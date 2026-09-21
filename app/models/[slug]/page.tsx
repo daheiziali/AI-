@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowUpRight, BarChart3, CalendarDays, Database, LineChart, TrendingUp } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ModelPriceHistoryChart } from "@/app/components/model-price-history-chart";
 import { ModelTokenActivityChart } from "@/app/components/model-token-activity-chart";
@@ -19,8 +20,8 @@ export default async function ModelDetailPage({ params }: { params: Promise<{ sl
   return (
     <div className="detail-page model-detail-page">
       <header className="detail-topbar">
-        <a className="detail-brand" href="/#llm-models"><span className="brand-mark"><LineChart /></span><strong>AI Dashboard</strong></a>
-        <a className="detail-back" href="/#llm-models"><ArrowLeft />返回模型排行</a>
+        <Link className="detail-brand" href="/#llm-models"><span className="brand-mark"><LineChart /></span><strong>AI Dashboard</strong></Link>
+        <Link className="detail-back" href="/#llm-models"><ArrowLeft />返回模型排行</Link>
       </header>
 
       <main className="detail-content">
@@ -51,7 +52,7 @@ export default async function ModelDetailPage({ params }: { params: Promise<{ sl
 
         <section className="detail-about"><p className="eyebrow">MODEL PROFILE</p><h2>模型简介</h2><p>{model.summary}</p></section>
 
-        <section className="detail-related"><p className="eyebrow">RELATED MODELS</p><h2>同类模型</h2><div>{related.map((candidate) => <a key={candidate.slug} href={`/models/${candidate.slug}`}><span>{candidate.name}<small>{candidate.providerLabel}</small></span><strong>{candidate.ranking.day.display}</strong><ArrowUpRight /></a>)}</div></section>
+        <section className="detail-related"><p className="eyebrow">RELATED MODELS</p><h2>同类模型</h2><div>{related.map((candidate) => <Link key={candidate.slug} href={`/models/${candidate.slug}`}><span>{candidate.name}<small>{candidate.providerLabel}</small></span><strong>{candidate.ranking.day.display}</strong><ArrowUpRight /></Link>)}</div></section>
       </main>
     </div>
   );

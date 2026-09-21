@@ -4,6 +4,7 @@ import {
   Activity, ArrowRight, BarChart3, Bell, ChevronDown, Command, Cpu, Database,
   Home as HomeIcon, Menu, Search, Server, Settings, Sparkles, Star, TrendingDown, TrendingUp,
 } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -114,13 +115,13 @@ function LlmModelPanel({ window, setWindow }: { window: ModelRankingWindow; setW
             {column.map((model, localIndex) => {
               const rank = localIndex * 2 + columnIndex + 1;
               return (
-                <a className="model-board-row" href={`/models/${model.slug}`} key={model.slug}>
+                <Link className="model-board-row" href={`/models/${model.slug}`} key={model.slug}>
                   <b>{rank}</b>
                   <ModelLogo name={model.name} provider={model.provider} />
                   <span><strong>{model.name}</strong><small>{model.providerLabel}</small></span>
                   <em>{model.ranking[window].display}</em>
                   <i className={model.ranking[window].change >= 0 ? "positive" : "negative"}>{model.ranking[window].change >= 0 ? "+" : ""}{model.ranking[window].change}%</i>
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -197,7 +198,7 @@ export default function Home() {
   const renderIndexCard = (item: IndexDefinition) => (
     <article className="index-card" key={item.code}>
       <div className="card-top"><div><h4>{item.name}</h4><span>{item.code}</span></div><button className={favorites.includes(item.name) ? "is-favorite" : ""} onClick={() => toggleFavorite(item.name)} aria-label={`收藏 ${item.name}`} aria-pressed={favorites.includes(item.name)}><Star /></button></div>
-      <div className="card-value"><div><strong>{item.value}</strong><span>{item.unit}</span><p className={item.change >= 0 ? "positive" : "negative"}>{item.change >= 0 ? <TrendingUp /> : <TrendingDown />}{Math.abs(item.change)}% <em>vs 7D</em></p></div><a className="card-detail-link" href={`/indices/${item.slug}`}>详情 <ArrowRight /></a></div>
+      <div className="card-value"><div><strong>{item.value}</strong><span>{item.unit}</span><p className={item.change >= 0 ? "positive" : "negative"}>{item.change >= 0 ? <TrendingUp /> : <TrendingDown />}{Math.abs(item.change)}% <em>vs 7D</em></p></div><Link className="card-detail-link" href={`/indices/${item.slug}`}>详情 <ArrowRight /></Link></div>
     </article>
   );
 
@@ -232,7 +233,7 @@ export default function Home() {
           </section>
 
           <section className="hero-grid">
-            <div className="hero-metric"><div className="hero-index"><span>LLM Token支出指数</span><small>SDLLMTK</small></div><p>当前价格</p><strong>1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>美元/百万Tokens</small><a href="/indices/llm-token-expenditure">查看指数详情 <ArrowRight /></a></div>
+            <div className="hero-metric"><div className="hero-index"><span>LLM Token支出指数</span><small>SDLLMTK</small></div><p>当前价格</p><strong>1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>美元/百万Tokens</small><Link href="/indices/llm-token-expenditure">查看指数详情 <ArrowRight /></Link></div>
             <div className="hero-chart"><TokenHistoryChart /></div>
           </section>
 
