@@ -49,13 +49,8 @@ function DataCenterPanel() {
 
   return (
     <article className="epoch-panel data-center-panel" id="data-centers">
-      <div className="epoch-panel-head"><div><p className="eyebrow">AI DATA CENTER RANKING</p><h4>AI数据中心算力排行</h4></div><span>日更观察</span></div>
+      <div className="epoch-panel-head"><div><p className="eyebrow">AI DATA CENTER RANKING</p><h4>AI数据中心排行</h4></div><span>日更观察</span></div>
       <div className="ranking-tabs dc-tabs" aria-label="数据中心维度">{(Object.keys(dataCenterMetrics) as DataCenterMetric[]).map((key) => <button key={key} className={metric === key ? "active" : ""} onClick={() => setMetric(key)}>{dataCenterMetrics[key].label}</button>)}</div>
-      <div className="dc-chart-title">
-        <h5>AI数据中心按{dataCenterMetrics[metric].label}排行</h5>
-        <p>{metric === "compute" ? "参照 H100 等效算力口径，展示主要 AI 数据中心的相对规模。" : metric === "power" ? "以 IT Power 观察数据中心可承载的基础设施能力。" : "以估算建设成本观察大型 AI 数据中心的资本投入规模。"}</p>
-      </div>
-      <div className="dc-summary"><div><strong>86</strong><span>站点覆盖</span></div><div><strong>13.6M</strong><span>H100 等效总量</span></div><div><strong>13.1GW</strong><span>IT Power 总量</span></div></div>
       <div className="dc-chart-scroll">
         <div className="dc-bar-chart">
           <div className="dc-axis-title">{dataCenterMetrics[metric].short}（{dataCenterMetrics[metric].unit}）</div>
@@ -266,7 +261,6 @@ export default function Home() {
             </div>
             <div className="landscape-hero">
               <div><h3>聚焦更动态的基础设施与模型调用数据，跟踪 AI 算力供给、资本投入与推理流量变化。</h3><small className="source-note">数据参考：Epoch AI 历史数据、OpenRouter 模型排行</small></div>
-              <div className="landscape-stats"><span><strong>2</strong>数据模块</span><span><strong>3</strong>数据中心维度</span><span><strong>3</strong>模型时间窗口</span></div>
             </div>
             <div className="epoch-grid">
               <DataCenterPanel />
