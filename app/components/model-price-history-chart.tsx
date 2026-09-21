@@ -74,9 +74,9 @@ export function ModelPriceHistoryChart({ history, name }: { history: ModelPriceP
           {hoveredIndex !== null && <line x1={selected?.x} y1="30" x2={selected?.x} y2="260" stroke="#d2b4ff" strokeDasharray="3 4" opacity=".65" />}
           <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#08110f" stroke="#d2b4ff" strokeWidth="2.5" />
         </svg>
-        {hoveredIndex !== null && selected && <div className={`chart-tooltip detail-tooltip purple ${selected.x > 736 ? "align-right" : ""}`} style={{ left: `${(selected.x / 920) * 100}%`, top: `${(selected.y / 270) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>美元/百万Tokens</small></div>}
+        {hoveredIndex !== null && selected && <div className={`chart-tooltip detail-tooltip purple ${selected.x > 736 ? "align-right" : ""}`} style={{ left: `${(selected.x / 920) * 100}%`, top: `${(selected.y / 270) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>{selected.value.toFixed(4)}</strong><small>美元/百万Tokens</small></div>}
         <div className="detail-x">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{point.date.slice(5).replace("-", "/")}</span>)}</div>
-        <div className="detail-chart-stats"><span>{visible.length} 个价格点</span><span>区间最低 <b>${min.toFixed(3)}</b></span><span>区间最高 <b>${max.toFixed(3)}</b></span></div>
+        <div className="detail-chart-stats"><span>{visible.length} 个价格点</span><span>区间最低 <b>{min.toFixed(3)}</b></span><span>区间最高 <b>{max.toFixed(3)}</b></span></div>
       </div>
     </>
   );

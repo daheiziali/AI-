@@ -44,9 +44,13 @@ function DataCenterPanel() {
   const ranked = [...dataCenterRankings].sort((a, b) => b[metric] - a[metric]);
   const visible = expanded ? ranked : ranked.slice(0, 10);
   const max = ranked[0][metric];
-  const labelFor = (item: (typeof dataCenterRankings)[number]) => metric === "compute" ? item.computeLabel : metric === "power" ? item.powerLabel : item.costLabel;
-  const axisMax = metric === "compute" ? "1.5M" : metric === "power" ? "1GW" : "$40B";
-  const axisMid = metric === "compute" ? "750K" : metric === "power" ? "500MW" : "$20B";
+  const formatValue = (value: number) => {
+    if (metric === "compute") return `${Number((value / 10).toFixed(1))}万`;
+    if (metric === "power") return `${value}兆瓦`;
+    return `${Number((value * 10).toFixed(1))}亿美元`;
+  };
+  const axisMax = metric === "compute" ? "150万" : metric === "power" ? "1000兆瓦" : "400亿美元";
+  const axisMid = metric === "compute" ? "75万" : metric === "power" ? "500兆瓦" : "200亿美元";
 
   return (
     <article className="epoch-panel data-center-panel" id="data-centers">
@@ -62,7 +66,7 @@ function DataCenterPanel() {
                 <div className="dc-bar-name"><b>{index + 1}</b><span>{item.name}<small>{item.owner} · {item.year}</small></span></div>
                 <div className="dc-bar-lane">
                   <i style={{ width: `${Math.max(8, (item[metric] / max) * 100)}%` }} />
-                  <strong>{labelFor(item)}</strong>
+                  <strong>{formatValue(item[metric])}</strong>
                 </div>
               </div>
             ))}
@@ -173,10 +177,10 @@ function TokenHistoryChart() {
           {hoveredIndex !== null && <line x1={selected?.x} y1="20" x2={selected?.x} y2="215" stroke="#1487ba" strokeDasharray="3 4" opacity=".55" />}
           <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#ffffff" stroke="#1487ba" strokeWidth="2.5" />
         </svg>
-        {hoveredIndex !== null && selected && <div className={`chart-tooltip ${selected.x > 600 ? "align-right" : ""}`} style={{ left: `${(selected.x / 760) * 100}%`, top: `${(selected.y / 225) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>美元/百万Tokens</small></div>}
+        {hoveredIndex !== null && selected && <div className={`chart-tooltip ${selected.x > 600 ? "align-right" : ""}`} style={{ left: `${(selected.x / 760) * 100}%`, top: `${(selected.y / 225) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>{selected.value.toFixed(4)}</strong><small>美元/百万Tokens</small></div>}
         <div className="history-x" aria-hidden="true">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{formatDate(point.date)}</span>)}</div>
       </div>
-      <div className="chart-summary"><span>{visible.length} 个观测值</span><span>区间最低 <b>${min.toFixed(3)}</b></span><span>区间最高 <b>${max.toFixed(3)}</b></span></div>
+      <div className="chart-summary"><span>{visible.length} 个观测值</span><span>区间最低 <b>{min.toFixed(3)}</b></span><span>区间最高 <b>{max.toFixed(3)}</b></span></div>
     </div>
   );
 }
@@ -228,7 +232,7 @@ export default function Home() {
           </section>
 
           <section className="hero-grid">
-            <div className="hero-metric"><div className="hero-index"><span>LLM Token支出指数</span><small>SDLLMTK</small></div><p>当前价格</p><strong>$1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>单位：美元/百万Tokens</small><a href="/indices/llm-token-expenditure">查看指数详情 <ArrowRight /></a></div>
+            <div className="hero-metric"><div className="hero-index"><span>LLM Token支出指数</span><small>SDLLMTK</small></div><p>当前价格</p><strong>1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>美元/百万Tokens</small><a href="/indices/llm-token-expenditure">查看指数详情 <ArrowRight /></a></div>
             <div className="hero-chart"><TokenHistoryChart /></div>
           </section>
 

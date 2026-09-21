@@ -22,7 +22,7 @@ const changeConditions = [
 ] as const;
 
 export function IndexAlertDialog({ name, value, unit }: { name: string; value: string; unit: string }) {
-  const initialValue = value.replace("$", "");
+  const initialValue = value;
   const [saved, setSaved] = useState(false);
   const [mode, setMode] = useState<"price" | "change">("price");
   const [condition, setCondition] = useState("cross-up");
@@ -31,7 +31,7 @@ export function IndexAlertDialog({ name, value, unit }: { name: string; value: s
   const conditions = mode === "price" ? priceConditions : changeConditions;
   const selectedLabel = conditions.find((item) => item.value === condition)?.label ?? conditions[0].label;
   const summary = useMemo(() => mode === "price"
-    ? `${name} ${selectedLabel.replace(/^[≥≤↑↓]\s/, "")} $${target} ${unit}`
+    ? `${name} ${selectedLabel.replace(/^[≥≤↑↓]\s/, "")} ${target} ${unit}`
     : `${name} 近 7 日${selectedLabel} ${target}%`, [condition, mode, name, selectedLabel, target, unit]);
 
   const changeMode = (nextMode: string) => {

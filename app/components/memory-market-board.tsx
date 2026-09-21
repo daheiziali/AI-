@@ -150,7 +150,7 @@ export function MemoryMarketBoard() {
           {currentCategory.quotes.map((quote) => (
             <div className="memory-table-row" key={`${market}-${currentCategory.id}-${quote.product}-${quote.specification}`}>
               <span><strong>{quote.product}</strong><small>{quote.specification}</small></span>
-              <span>{quote.high}</span><span>{quote.low}</span><span className="memory-average">{quote.average}</span>
+              <span>{quote.high.replace("$", "")}</span><span>{quote.low.replace("$", "")}</span><span className="memory-average">{quote.average.replace("$", "")}</span>
               <span className={quote.change === null ? "" : quote.change >= 0 ? "positive" : "negative"}>{quote.change === null ? "—" : `${quote.change > 0 ? "+" : ""}${quote.change.toFixed(2)}%`}</span>
             </div>
           ))}
