@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./memory-market-board.css";
+import "./light-theme.css";
 
 export const metadata: Metadata = {
   title: "AI Dashboard | AI算力市场",
