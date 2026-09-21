@@ -7,6 +7,7 @@ import {
 import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CrossMarketSignals } from "@/app/components/cross-market-signals";
 import { gpuIndices, ramIndices, tokenIndices, type IndexDefinition } from "@/app/data/indices";
 import { getRankedModels, modelRankingWindows, type ModelRankingWindow } from "@/app/data/llm-models";
 import { tokenHistory } from "@/app/data/token-history";
@@ -206,6 +207,7 @@ export default function Home() {
           <a className="nav-item active" href="#overview"><Sparkles />AI算力CPI</a>
           <a className="nav-item" href="#gpu"><Cpu />GPU租赁价格</a>
           <a className="nav-item" href="#ram"><Database />RAM内存指数</a>
+          <a className="nav-item" href="#cross-market"><Activity />跨市场信号</a>
           <p className="nav-label nav-label-spaced">AI排行榜</p>
           <a className="nav-item" href="#data-centers"><Server />AI数据中心</a>
           <a className="nav-item" href="#llm-models"><BarChart3 />LLM模型排行</a>
@@ -253,6 +255,8 @@ export default function Home() {
             <div className="ai-brief-grid"><div><span>推理成本</span><strong>开源下降，闭源上涨</strong><p>开源LLM Token支出下降 5.3%，闭源指数上涨 3.5%，两类模型的成本走势分化。</p></div><div><span>GPU租赁</span><strong>高端型号普遍偏强</strong><p>H200、B200 与 MI300X 均录得上涨，H200近7日涨幅在GPU指数中居前。</p></div><div><span>内存市场</span><strong>GDDR6价格上涨</strong><p>RAM内存指数近7日上涨 1.0%，硬件成本尚未出现同步回落。</p></div></div>
             <p className="ai-brief-note">本解读仅依据当前看板数据生成，不对未接入的新闻、供需事件作原因判断。</p>
           </section>
+
+          <CrossMarketSignals />
 
           <section id="ai-landscape" className="section-block epoch-workspace">
             <div className="section-head landscape-head">
