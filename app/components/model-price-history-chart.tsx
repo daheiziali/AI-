@@ -68,10 +68,9 @@ export function ModelPriceHistoryChart({ history, name }: { history: ModelPriceP
       <div className="detail-chart-wrap model-price-wrap">
         <div className="detail-y"><span>{chartMax.toFixed(2)}</span><span>{((chartMax + chartMin) / 2).toFixed(2)}</span><span>{chartMin.toFixed(2)}</span></div>
         <svg viewBox="0 0 920 270" preserveAspectRatio="none" role="img" aria-label={`${name} 价格历史`} onPointerMove={handlePointerMove} onPointerLeave={() => setHoveredIndex(null)}>
-          <defs><linearGradient id="model-price-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#a766ff" stopOpacity="0.24" /><stop offset="1" stopColor="#a766ff" stopOpacity="0" /></linearGradient></defs>
           {[40, 145, 250].map((y) => <line key={y} x1="0" y1={y} x2="920" y2={y} className="grid-line" />)}
-          <polygon points={`0,260 ${line} 920,260`} fill="url(#model-price-area)" />
-          <polyline points={line} fill="none" stroke="#a766ff" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
+          <polygon points={`0,260 ${line} 920,260`} fill="#1487ba" opacity="0.10" />
+          <polyline points={line} fill="none" stroke="#1487ba" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
           {hoveredIndex !== null && <line x1={selected?.x} y1="30" x2={selected?.x} y2="260" stroke="#d2b4ff" strokeDasharray="3 4" opacity=".65" />}
           <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#08110f" stroke="#d2b4ff" strokeWidth="2.5" />
         </svg>

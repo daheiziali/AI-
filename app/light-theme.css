@@ -126,3 +126,67 @@ body, .app-frame, .detail-page { background: #f4f6f9; color: #172033; }
   .mobile-nav { border-color: #d6e0ea; background: rgb(255 255 255 / 94%); box-shadow: 0 -8px 24px rgb(15 23 42 / 8%); }
   .mobile-nav a { color: #718096; }.mobile-nav a.active { color: #1d4ed8; }
 }
+
+/* PLUS-inspired flat palette: one clear blue, neutral surfaces, no decorative gradients. */
+:root {
+  --primary: #1487ba;
+  --primary-foreground: #ffffff;
+  --secondary: #eaf6fb;
+  --secondary-foreground: #0876a8;
+  --accent: #e9f5fb;
+  --accent-foreground: #0876a8;
+  --ring: #1487ba;
+  --chart-1: #1487ba;
+  --chart-3: #1487ba;
+  --sidebar-primary: #1487ba;
+  --sidebar-accent: #e9f5fb;
+  --sidebar-accent-foreground: #0876a8;
+  --sidebar-ring: #1487ba;
+}
+
+.brand-mark { background: #1487ba; box-shadow: none; }
+.nav-item:hover, .nav-item.active { background: #e9f5fb; color: #0876a8; }
+.nav-item.active { box-shadow: inset 3px 0 #1487ba; }
+.index-chip, .verified-label { border-color: #b8dfef; background: #eef9fd; color: #0876a8; }
+.alert-button { border-color: #afd9ea; background: #f1faff; color: #0876a8; }
+.hero-metric > a, .section-head a, .card-detail-link, .epoch-panel-head > span, .ai-brief-grid span { color: #0876a8; }
+.chart-toolbar [data-slot="tabs-trigger"][data-state="active"], .model-ranking-top [data-slot="tabs-trigger"][data-state="active"], .memory-market-tabs button.active, .memory-quote-tabs button.active, .memory-category-tabs button.active, .ranking-tabs button.active, .detail-chart-controls button.active, .model-mode-tabs button.active { border-color: #b8dfef; background: #e9f5fb; color: #0876a8; }
+
+.hero-grid, .index-card, .memory-board, .epoch-panel, .market-pulse, .insight, .definition-card, .alert-dialog, .detail-chart-wrap, .detail-about, .detail-related, .model-price-wrap, .model-token-wrap, .ranking-table, .signal-table, .sidebar, .topbar, .detail-topbar { box-shadow: none; }
+.index-card:hover, .model-board-row:hover, .rank-row:hover { border-color: #a9d6e8; background: #f7fcff; box-shadow: none; transform: none; }
+
+.history-plot polyline, .detail-chart-wrap polyline, .token-chart-main polyline { stroke: #1487ba; }
+.history-plot stop:first-child, .detail-chart-wrap stop:first-child, .token-chart-main stop:first-child { stop-color: #1487ba; }
+.history-plot circle, .detail-chart-wrap circle { fill: #ffffff; stroke: #1487ba; }
+.history-plot line[stroke], .detail-chart-wrap line[stroke] { stroke: #8ccde5; }
+.dot.cpi { background: #1487ba; }
+
+.pulse-track { background: #dce8ef; }
+.pulse-track::after { background: #1487ba; }
+.rank-row i { background: #1487ba; }
+.history-unavailable { background: #f8fafc; }
+
+.dc-bar-chart { background: #ffffff; border-color: #d6e3ea; }
+.dc-axis-title, .dc-value-axis, .dc-year-axis { color: #61748b; }
+.dc-bars::before, .dc-bars::after { background: #dce7ee; }
+.dc-bar-lane { background: #edf3f6; }
+.dc-bar-lane i { background: #1487ba; box-shadow: none; }
+.dc-bar-lane strong { color: #ffffff; }
+.dc-bar-name { color: #1f2d3d; }
+.dc-bar-name small { color: #7b8b9c; }
+.dc-bar-name b, .model-board-row > b, .rank-row > span, .ranking-row > b, .company-rank-card b { border: 0; border-radius: 5px; background: #e9f5fb; color: #0876a8; }
+.dc-time-axis button { background: #e9f5fb; color: #0876a8; }
+.dc-time-axis button span { border-left-color: #0876a8; }
+.dc-time-axis > div { color: #607089; }
+.dc-time-axis i { background: #d9e6ed; }
+.dc-time-axis i::before { position: absolute; inset: 0 auto 0 0; width: 50%; border-radius: inherit; background: #1487ba; content: ""; }
+.dc-time-axis em { background: #1487ba; box-shadow: 0 0 0 4px rgb(20 135 186 / 12%); }
+.dc-panel-actions button { color: #0876a8; }
+
+.model-logo { background: #eef7fb; color: #0876a8; box-shadow: inset 0 0 0 1px #c6e1ed; }
+.provider-openai, .provider-deepseek, .provider-zai, .provider-tencent, .provider-nvidia, .provider-anthropic, .provider-qwen, .provider-google { background: #eef7fb; color: #0876a8; }
+.model-board-row em { color: #223044; }
+.model-board-row > b, .rank-row > span { box-shadow: none; }
+
+.positive { color: #16866a !important; }
+.is-favorite { color: #d19a26 !important; }

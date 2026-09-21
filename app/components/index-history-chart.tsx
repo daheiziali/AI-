@@ -49,12 +49,11 @@ export function IndexHistoryChart({ history, name }: { history: Array<{ date: st
       <div className="detail-chart-wrap">
         <div className="detail-y"><span>{chartMax.toFixed(2)}</span><span>{((chartMax + chartMin) / 2).toFixed(2)}</span><span>{chartMin.toFixed(2)}</span></div>
         <svg viewBox="0 0 920 270" preserveAspectRatio="none" role="img" aria-label={`${name} ${range} 历史走势`} onPointerMove={handlePointerMove} onPointerLeave={() => setHoveredIndex(null)}>
-          <defs><linearGradient id="detail-index-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#52d6b0" stopOpacity="0.25" /><stop offset="1" stopColor="#52d6b0" stopOpacity="0" /></linearGradient></defs>
           {[40, 145, 250].map((y) => <line key={y} x1="0" y1={y} x2="920" y2={y} className="grid-line" />)}
-          <polygon points={`0,260 ${line} 920,260`} fill="url(#detail-index-area)" />
-          <polyline points={line} fill="none" stroke="#52d6b0" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
-          {hoveredIndex !== null && <line x1={selected?.x} y1="30" x2={selected?.x} y2="260" stroke="#78e2c3" strokeDasharray="3 4" opacity=".65" />}
-          <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#08120f" stroke="#78e2c3" strokeWidth="2.5" />
+          <polygon points={`0,260 ${line} 920,260`} fill="#1487ba" opacity="0.10" />
+          <polyline points={line} fill="none" stroke="#1487ba" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
+          {hoveredIndex !== null && <line x1={selected?.x} y1="30" x2={selected?.x} y2="260" stroke="#1487ba" strokeDasharray="3 4" opacity=".55" />}
+          <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#ffffff" stroke="#1487ba" strokeWidth="2.5" />
         </svg>
         {hoveredIndex !== null && selected && <div className={`chart-tooltip detail-tooltip ${selected.x > 736 ? "align-right" : ""}`} style={{ left: `${(selected.x / 920) * 100}%`, top: `${(selected.y / 270) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>{name}</small></div>}
         <div className="detail-x">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{point.date.replaceAll("-", ".")}</span>)}</div>

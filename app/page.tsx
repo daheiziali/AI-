@@ -167,12 +167,11 @@ function TokenHistoryChart() {
       <div className="history-plot">
         <div className="history-y" aria-hidden="true"><span>{chartMax.toFixed(2)}</span><span>{((chartMax + chartMin) / 2).toFixed(2)}</span><span>{chartMin.toFixed(2)}</span></div>
         <svg viewBox="0 0 760 225" preserveAspectRatio="none" role="img" aria-label={`AI算力CPI ${range} 历史价格走势，最新值 ${points.at(-1)?.value.toFixed(4)}`} onPointerMove={handlePointerMove} onPointerLeave={() => setHoveredIndex(null)}>
-          <defs><linearGradient id="token-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#52d6b0" stopOpacity="0.22" /><stop offset="1" stopColor="#52d6b0" stopOpacity="0" /></linearGradient></defs>
           {[30, 117.5, 205].map((y) => <line key={y} x1="0" y1={y} x2="760" y2={y} className="grid-line" />)}
-          <polygon points={`0,215 ${line} 760,215`} fill="url(#token-area)" />
-          <polyline points={line} fill="none" stroke="#52d6b0" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
-          {hoveredIndex !== null && <line x1={selected?.x} y1="20" x2={selected?.x} y2="215" stroke="#78e2c3" strokeDasharray="3 4" opacity=".65" />}
-          <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#08120f" stroke="#78e2c3" strokeWidth="2.5" />
+          <polygon points={`0,215 ${line} 760,215`} fill="#1487ba" opacity="0.10" />
+          <polyline points={line} fill="none" stroke="#1487ba" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
+          {hoveredIndex !== null && <line x1={selected?.x} y1="20" x2={selected?.x} y2="215" stroke="#1487ba" strokeDasharray="3 4" opacity=".55" />}
+          <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#ffffff" stroke="#1487ba" strokeWidth="2.5" />
         </svg>
         {hoveredIndex !== null && selected && <div className={`chart-tooltip ${selected.x > 600 ? "align-right" : ""}`} style={{ left: `${(selected.x / 760) * 100}%`, top: `${(selected.y / 225) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>美元/百万Tokens</small></div>}
         <div className="history-x" aria-hidden="true">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{formatDate(point.date)}</span>)}</div>
