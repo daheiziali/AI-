@@ -1,0 +1,12 @@
+.memory-board-toolbar { padding-bottom: 10px; }
+.memory-category-scroll { overflow-x: auto; border-bottom: 1px solid #22322d; padding: 10px 14px; scrollbar-width: none; }
+.memory-category-scroll::-webkit-scrollbar { display: none; }
+.memory-category-tabs { display: flex; width: max-content; min-width: 100%; gap: 7px; }
+.memory-category-tabs button { min-height: 30px; border: 1px solid #2b3c36; border-radius: 5px; background: #09120f; padding: 0 11px; color: #82938d; font-size: 11px; white-space: nowrap; }
+.memory-category-tabs button.active { border-color: #4d7165; background: #263a33; color: #e5f4ef; }
+.memory-board-meta { align-items: flex-start; }
+.memory-board-meta > div { min-width: 0; }
+.memory-board-meta strong,.memory-board-meta small { display: block; }
+.memory-board-meta small { margin-top: 5px; color: #7f918a; font-size: 10px; line-height: 1.4; }
+.memory-board-meta > span { flex: 0 0 auto; line-height: 1.4; }
+@media (max-width: 760px) { .memory-category-scroll { padding-right: 0; }.memory-category-tabs { padding-right: 14px; } }
