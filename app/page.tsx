@@ -70,7 +70,7 @@ function DataCenterPanel() {
             <button aria-label="播放时间轴"><span /></button>
             <div><strong>Q1 2023</strong><i><em style={{ left: "50%" }} /></i><strong>Q1 2030</strong></div>
           </div>
-          <div className="dc-year-axis"><span>2023</span><span>2024</span><span>2025</span><span>Today</span><span>2027</span><span>2028</span><span>2029</span><span>2030</span></div>
+          <div className="dc-year-axis"><span>2023</span><span>2024</span><span>2025</span><span>今日</span><span>2027</span><span>2028</span><span>2029</span><span>2030</span></div>
         </div>
       </div>
       <div className="dc-panel-actions"><button onClick={() => setExpanded((current) => !current)}>{expanded ? "收起" : "展开全部"} <ArrowRight /></button></div>
@@ -160,7 +160,7 @@ function TokenHistoryChart() {
   return (
     <div className="history-chart">
       <div className="chart-toolbar">
-        <div className="legend"><span><i className="dot cpi" />AI算力CPI · USD / 百万 Tokens</span></div>
+        <div className="legend"><span><i className="dot cpi" />AI算力CPI · 美元/百万Tokens</span></div>
         <Tabs value={range} onValueChange={(value) => setRange(value as HistoryRange)}><TabsList>{Object.keys(historyRanges).map((item) => <TabsTrigger key={item} value={item}>{item}</TabsTrigger>)}</TabsList></Tabs>
       </div>
       <div className="history-plot">
@@ -173,7 +173,7 @@ function TokenHistoryChart() {
           {hoveredIndex !== null && <line x1={selected?.x} y1="20" x2={selected?.x} y2="215" stroke="#78e2c3" strokeDasharray="3 4" opacity=".65" />}
           <circle cx={selected?.x} cy={selected?.y} r={hoveredIndex === null ? 4 : 5} fill="#08120f" stroke="#78e2c3" strokeWidth="2.5" />
         </svg>
-        {hoveredIndex !== null && selected && <div className={`chart-tooltip ${selected.x > 600 ? "align-right" : ""}`} style={{ left: `${(selected.x / 760) * 100}%`, top: `${(selected.y / 225) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>USD / 百万 Tokens</small></div>}
+        {hoveredIndex !== null && selected && <div className={`chart-tooltip ${selected.x > 600 ? "align-right" : ""}`} style={{ left: `${(selected.x / 760) * 100}%`, top: `${(selected.y / 225) * 100}%` }}><span>{selected.date.replaceAll("-", ".")}</span><strong>${selected.value.toFixed(4)}</strong><small>美元/百万Tokens</small></div>}
         <div className="history-x" aria-hidden="true">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{formatDate(point.date)}</span>)}</div>
       </div>
       <div className="chart-summary"><span>{visible.length} 个观测值</span><span>区间最低 <b>${min.toFixed(3)}</b></span><span>区间最高 <b>${max.toFixed(3)}</b></span></div>
@@ -206,7 +206,7 @@ export default function Home() {
           <a className="nav-item active" href="#overview"><Sparkles />AI算力CPI</a>
           <a className="nav-item" href="#gpu"><Cpu />GPU租赁价格</a>
           <a className="nav-item" href="#ram"><Database />RAM内存指数</a>
-          <p className="nav-label nav-label-spaced">AI动态排行</p>
+          <p className="nav-label nav-label-spaced">AI排行榜</p>
           <a className="nav-item" href="#data-centers"><Server />AI数据中心</a>
           <a className="nav-item" href="#llm-models"><BarChart3 />LLM模型排行</a>
           <p className="nav-label nav-label-spaced">TOOLS</p>
@@ -228,7 +228,7 @@ export default function Home() {
           </section>
 
           <section className="hero-grid">
-            <div className="hero-metric"><div className="hero-index"><span>LLM Token支出指数</span><small>SDLLMTK</small></div><p>当前价格</p><strong>$1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>USD / 百万 Tokens</small><a href="/indices/llm-token-expenditure">查看指数详情 <ArrowRight /></a></div>
+            <div className="hero-metric"><div className="hero-index"><span>LLM Token支出指数</span><small>SDLLMTK</small></div><p>当前价格</p><strong>$1.01</strong><div><span className="positive"><TrendingUp />3.4%</span><span>近 7 日</span></div><small>单位：美元/百万Tokens</small><a href="/indices/llm-token-expenditure">查看指数详情 <ArrowRight /></a></div>
             <div className="hero-chart"><TokenHistoryChart /></div>
           </section>
 
@@ -256,11 +256,7 @@ export default function Home() {
 
           <section id="ai-landscape" className="section-block epoch-workspace">
             <div className="section-head landscape-head">
-              <div><p className="eyebrow">AI INFRASTRUCTURE & MODEL RANKING</p><h3>AI动态排行</h3></div>
-              <div className="landscape-tabs" aria-label="数据视图"><span className="active">排行</span><span>趋势</span><span>明细</span></div>
-            </div>
-            <div className="landscape-hero">
-              <div><h3>聚焦更动态的基础设施与模型调用数据，跟踪 AI 算力供给、资本投入与推理流量变化。</h3><small className="source-note">数据参考：Epoch AI 历史数据、OpenRouter 模型排行</small></div>
+              <div><p className="eyebrow">AI INFRASTRUCTURE & MODEL RANKING</p><h2>AI排行榜</h2><p className="landscape-summary">跟踪 AI 数据中心供给与模型 Token 消耗变化。</p><small className="source-note">数据参考：Epoch AI 历史数据、OpenRouter 模型排行</small></div>
             </div>
             <div className="epoch-grid">
               <DataCenterPanel />

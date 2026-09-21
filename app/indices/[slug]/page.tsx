@@ -32,7 +32,7 @@ export default async function IndexDetailPage({ params }: { params: Promise<{ sl
 
         <section className="detail-quote">
           <div className="detail-current"><span>当前报价</span><div><strong>{item.value}</strong><small>{item.unit}</small></div><p className={item.change >= 0 ? "positive" : "negative"}>{item.change >= 0 ? <TrendingUp /> : <TrendingDown />}{Math.abs(item.change)}% <em>近 7 日</em></p></div>
-          <div className="detail-meta"><div><CalendarDays /><span>最新更新<strong>{item.updatedAt}</strong></span></div><div><Clock3 /><span>更新时间<strong>{item.updateSchedule ?? "以最新更新日期为准"}</strong></span></div><div><Database /><span>报价单位<strong>{item.unit.replace("/", "")}</strong></span></div></div>
+          <div className="detail-meta"><div><CalendarDays /><span>最新更新<strong>{item.updatedAt}</strong></span></div><div><Clock3 /><span>更新时间<strong>{item.updateSchedule ?? "以最新更新日期为准"}</strong></span></div><div><Database /><span>报价单位<strong>{item.unit}</strong></span></div></div>
         </section>
 
         <section className="detail-history">

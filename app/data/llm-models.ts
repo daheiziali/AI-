@@ -1,9 +1,9 @@
 export type ModelRankingWindow = "day" | "week" | "month";
 
 export const modelRankingWindows: Record<ModelRankingWindow, string> = {
-  day: "日",
-  week: "周",
-  month: "月",
+  day: "当日最新",
+  week: "近7日",
+  month: "近30日",
 };
 
 export type ModelPricePoint = {
@@ -35,7 +35,7 @@ export type LlmModelDefinition = {
   priceHistory: ModelPricePoint[];
 };
 
-const tokenPattern: ModelTokenPoint[] = [
+const weeklyTokenPattern: ModelTokenPoint[] = [
   { date: "2026-09-10", prompt: 6.85, reasoning: 0.06, completion: 0.11 },
   { date: "2026-09-11", prompt: 9.62, reasoning: 0.09, completion: 0.14 },
   { date: "2026-09-12", prompt: 8.86, reasoning: 0.08, completion: 0.13 },
@@ -48,6 +48,13 @@ const tokenPattern: ModelTokenPoint[] = [
   { date: "2026-09-19", prompt: 14.24, reasoning: 0.17, completion: 0.19 },
   { date: "2026-09-20", prompt: 4.92, reasoning: 0.05, completion: 0.07, estimated: true },
 ];
+
+const tokenPattern: ModelTokenPoint[] = weeklyTokenPattern.map((point) => ({
+  ...point,
+  prompt: Number((point.prompt / 7).toFixed(3)),
+  reasoning: Number((point.reasoning / 7).toFixed(3)),
+  completion: Number((point.completion / 7).toFixed(3)),
+}));
 
 const pricePattern: ModelPricePoint[] = [
   { date: "2026-09-10", effectiveInput: 0.198, effectiveOutput: 0.128, listedInput: 0.302, listedOutput: 0.146 },
@@ -80,7 +87,7 @@ const scalePriceHistory = (scale: number) =>
     listedOutput: Number((point.listedOutput * scale).toFixed(4)),
   }));
 
-export const llmModels: LlmModelDefinition[] = [
+const llmModelSeeds: LlmModelDefinition[] = [
   {
     slug: "deepseek-v41-flash",
     name: "DeepSeek V4.1 Flash",
@@ -322,6 +329,24 @@ export const llmModels: LlmModelDefinition[] = [
     priceHistory: scalePriceHistory(0.86),
   },
 ];
+
+export function formatTokenVolume(valueInTrillions: number) {
+  if (valueInTrillions >= 1) return `${Number(valueInTrillions.toFixed(2))}万亿`;
+  return `${Number((valueInTrillions * 10000).toFixed(1))}亿`;
+}
+
+export const llmModels: LlmModelDefinition[] = llmModelSeeds.map((model) => {
+  const weekly = model.ranking.day;
+  const dailyValue = weekly.value / 7;
+  return {
+    ...model,
+    ranking: {
+      day: { ...weekly, value: dailyValue, display: formatTokenVolume(dailyValue) },
+      week: { ...model.ranking.week, value: weekly.value, display: formatTokenVolume(weekly.value) },
+      month: { ...model.ranking.month, display: formatTokenVolume(model.ranking.month.value) },
+    },
+  };
+});
 
 export function getRankedModels(window: ModelRankingWindow) {
   return [...llmModels].sort((a, b) => b.ranking[window].value - a.ranking[window].value);

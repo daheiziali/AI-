@@ -2,7 +2,7 @@ import { ArrowLeft, ArrowUpRight, BarChart3, CalendarDays, Database, LineChart, 
 import { notFound } from "next/navigation";
 import { ModelPriceHistoryChart } from "@/app/components/model-price-history-chart";
 import { ModelTokenActivityChart } from "@/app/components/model-token-activity-chart";
-import { getLlmModel, llmModels } from "@/app/data/llm-models";
+import { formatTokenVolume, getLlmModel, llmModels } from "@/app/data/llm-models";
 
 export function generateStaticParams() {
   return llmModels.map((model) => ({ slug: model.slug }));
@@ -31,11 +31,11 @@ export default async function ModelDetailPage({ params }: { params: Promise<{ sl
         </section>
 
         <section className="detail-quote model-quote">
-          <div className="detail-current"><span>日 Token 消耗</span><div><strong>{daily.display}</strong><small>tokens</small></div><p className="positive"><TrendingUp />{daily.change}% <em>近 7 日</em></p></div>
+          <div className="detail-current"><span>当日 Token 消耗</span><div><strong>{daily.display}</strong><small>Tokens</small></div><p className="positive"><TrendingUp />{daily.change}% <em>较前一日</em></p></div>
           <div className="detail-meta">
             <div><Database /><span>模型提供方<strong>{model.providerLabel}</strong></span></div>
             <div><CalendarDays /><span>最新数据桶<strong>{model.latestBucket}</strong></span></div>
-            <div><BarChart3 /><span>当前观测<strong>{latestActivity ? `${(latestActivity.prompt + latestActivity.reasoning + latestActivity.completion).toFixed(2)}T tokens` : daily.display}</strong></span></div>
+            <div><BarChart3 /><span>当前观测<strong>{latestActivity ? formatTokenVolume(latestActivity.prompt + latestActivity.reasoning + latestActivity.completion) : daily.display}</strong></span></div>
           </div>
         </section>
 

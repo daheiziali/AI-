@@ -2,15 +2,10 @@
 
 import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { ModelTokenPoint } from "@/app/data/llm-models";
+import { formatTokenVolume, type ModelTokenPoint } from "@/app/data/llm-models";
 
 const ranges = { "3D": 3, "1W": 7, "1M": 30, "3M": 90, "1Y": 365, "全部": Infinity } as const;
 type Range = keyof typeof ranges;
-
-const formatToken = (value: number) => {
-  if (value >= 1) return `${Number(value.toFixed(2))}T`;
-  return `${Number((value * 1000).toFixed(1))}B`;
-};
 
 export function ModelTokenActivityChart({ activity, name }: { activity: ModelTokenPoint[]; name: string }) {
   const [range, setRange] = useState<Range>("1W");
@@ -42,7 +37,7 @@ export function ModelTokenActivityChart({ activity, name }: { activity: ModelTok
       </div>
       <div className="model-token-wrap">
         <div className="token-chart-main">
-          <div className="detail-y"><span>{formatToken(max)}</span><span>{formatToken(max / 2)}</span><span>0</span></div>
+          <div className="detail-y"><span>{formatTokenVolume(max)}</span><span>{formatTokenVolume(max / 2)}</span><span>0</span></div>
           <svg viewBox="0 0 920 270" preserveAspectRatio="none" role="img" aria-label={`${name} Token 活跃度`} onPointerMove={handlePointerMove} onPointerLeave={() => setHoveredIndex(null)}>
             {[35, 122, 209].map((y) => <line key={y} x1="0" y1={y} x2="920" y2={y} className="grid-line" />)}
             {visible.map((point, index) => {
@@ -65,13 +60,13 @@ export function ModelTokenActivityChart({ activity, name }: { activity: ModelTok
               );
             })}
           </svg>
-          {hoveredIndex !== null && selected && <div className="chart-tooltip model-token-tooltip"><span>{selected.date.replaceAll("-", ".")}</span><strong>{formatToken(selected.prompt + selected.reasoning + selected.completion)}</strong><small>Token 总量{selected.estimated ? " · 估算" : ""}</small></div>}
+          {hoveredIndex !== null && selected && <div className="chart-tooltip model-token-tooltip"><span>{selected.date.replaceAll("-", ".")}</span><strong>{formatTokenVolume(selected.prompt + selected.reasoning + selected.completion)}</strong><small>Token 总量{selected.estimated ? " · 估算" : ""}</small></div>}
           <div className="detail-x">{labels.map((point, index) => <span key={`${point.date}-${index}`}>{point.date.slice(5).replace("-", "/")}</span>)}</div>
         </div>
         <aside className="token-legend-panel">
-          <p><i className="prompt" />Prompt <b>{selected ? formatToken(selected.prompt) : "-"}</b></p>
-          <p><i className="reasoning" />Reasoning <b>{selected ? formatToken(selected.reasoning) : "-"}</b></p>
-          <p><i className="completion" />Completion <b>{selected ? formatToken(selected.completion) : "-"}</b></p>
+          <p><i className="prompt" />Prompt <b>{selected ? formatTokenVolume(selected.prompt) : "-"}</b></p>
+          <p><i className="reasoning" />Reasoning <b>{selected ? formatTokenVolume(selected.reasoning) : "-"}</b></p>
+          <p><i className="completion" />Completion <b>{selected ? formatTokenVolume(selected.completion) : "-"}</b></p>
           <small>Prompt 代表输入规模，Reasoning 代表中间推理消耗，Completion 代表输出长度。</small>
         </aside>
       </div>
