@@ -230,7 +230,7 @@ export const indexDefinitions: IndexDefinition[] = [
   {
     slug: "gddr6-ram",
     category: "ram",
-    name: "GDDR6 RAM内存指数",
+    name: "RAM内存综合指数（GDDR6）",
     code: "SDGDDR6",
     value: "$19.06",
     unit: "美元/GB",
